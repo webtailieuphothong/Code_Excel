@@ -1,0 +1,2759 @@
+<!DOCTYPE html>
+<html lang='vi'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>Mos-Word-Test 1 (43 câu)</title>
+<style>
+body{ font-family:Arial; background: #eef4f9; padding:6px; box-sizing:border-box; }
+
+.top-header,
+.question-title,
+.timeout-banner,
+.step1-box,
+.col-header-bar,
+.simulator-wrapper,
+.coord-box,
+.step-popup {
+    width:100%;
+    max-width:1200px;
+    margin-left:auto;
+    margin-right:auto;
+    box-sizing:border-box;
+}
+
+.top-header{ margin-top:10px; display:flex; align-items:center; gap:8px; width:100%; max-width:1200px; margin-left:auto; margin-right:auto; box-sizing:border-box; justify-content:space-between; }
+.btn-lang{ background:#7c3aed; color:#fff; border:none; padding:12px 14px; border-radius:10px; cursor:pointer; font-weight:bold; white-space:nowrap; font-size:14px; flex-shrink:0; }
+.btn-lang:hover{ background:#6d28d9; }
+.btn-lang.vi-active{ background:#16a34a; }
+.home-btn{ background:red; color:#fff; border:none; padding:12px 18px; border-radius:10px; cursor:pointer; font-weight:bold; white-space:nowrap; }
+.home-btn:hover{ background:#b91c1c; }
+#questionSelect{ flex:1; min-width:0; }
+.question-select{ width:100%; padding:12px; border-radius:10px; border:2px solid #cbd5e1; font-size:16px; font-weight:bold; background:#fff; }
+.select-locked{ background:#f1f5f9!important; color:#94a3b8!important; border-color:#e2e8f0!important; cursor:not-allowed!important; }
+#questionSelect.hidden-select{ visibility:hidden; pointer-events:none; opacity:0; }
+button{ padding:8px 8px; border:none; border-radius:10px; cursor:pointer; color:#fff; font-weight:bold; white-space:nowrap; }
+.start-btn{ background:#2563eb; min-width:160px; font-size:15px; transition:background 0.2s; }
+.start-btn:hover{ background:#1d4ed8; }
+.start-btn.running{ background:#16a34a; animation:pulse-green 1.5s infinite; }
+.start-btn.stopped{ background:#dc2626; }
+.start-btn.timeout{ background:#2563eb; animation:none; }
+@keyframes pulse-green{ 0%{background:#16a34a;} 50%{background:#15803d;box-shadow:0 0 8px rgba(22,163,74,0.5);} 100%{background:#16a34a;} }
+.btn-video{ background:#2563eb; padding:12px 8px; }
+.btn-debug{ background:red; padding:12px 8px; } .btn-debug.active{ background:#16a34a; }
+.btn-guide{ background:#2563eb; padding:12px 8px; }
+.btn-guide:hover{ background:#d97706; }
+
+/* ── TIÊU ĐỀ CÂU HỎI ── */
+.question-title{
+    width:100%; max-width:1200px;
+    margin-left:auto; margin-right:auto;
+    text-align:left; font-size:16px; font-weight:400; color:#444;line-height:1.4;
+    margin-bottom:6px; box-sizing:border-box;
+}
+
+/* ── HỘP THOẠI HƯỚNG DẪN ── */
+.guide-overlay{
+    position:fixed; left:0; top:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.55); z-index:29999;
+    display:none; justify-content:center; align-items:center;
+}
+.guide-overlay.show{ display:flex; }
+.guide-box{
+    background:#fff; border:3px solid #f59e0b;
+    border-radius:16px; padding:28px 30px 24px;
+    max-width:720px; width:94%; max-height:88vh; overflow-y:auto;
+    box-shadow:0 16px 50px rgba(0,0,0,0.35); position:relative;
+}
+.guide-close{
+    position:absolute; right:12px; top:10px;
+    font-size:24px; cursor:pointer; color:#374151; line-height:1;
+}
+.guide-close:hover{ color:#dc2626; }
+.guide-title{
+    font-size:20px; font-weight:bold; color:#92400e;
+    text-align:center; margin-bottom:6px;
+}
+.guide-subtitle{
+    font-size:16px; color:#dc2626; font-weight:bold;
+    text-align:center; margin-bottom:18px;
+    background:#fef3c7; padding:6px 12px; border-radius:8px;
+    border:1px solid #fde68a;
+}
+.guide-box h3{
+    font-size:16px; font-weight:bold; color:#1e3a5f;
+    margin:14px 0 6px; padding:6px 10px;
+    background:#eff6ff; border-left:4px solid #2563eb; border-radius:4px;
+}
+.guide-box p{ margin:4px 0 4px 10px; font-size:16px; color:#374151; line-height:1.7; }
+.guide-box ul{ margin:4px 0 4px 24px; padding:0; }
+.guide-box ul li{ font-size:16px; color:#374151; line-height:1.8; }
+.guide-box .note{
+    font-size:16px; color:#64748b; margin:4px 0 4px 10px;
+    padding-left:14px; border-left:3px solid #cbd5e1;
+}
+.guide-box .highlight{ color:#16a34a; font-weight:bold; }
+.guide-box .warn{ color:#dc2626; font-weight:bold; }
+.guide-btn-close{
+    display:block; margin:20px auto 0;
+    background:#2563eb; color:#fff; border:none;
+    padding:10px 32px; border-radius:10px;
+    font-size:16px; font-weight:bold; cursor:pointer;
+}
+.guide-btn-close:hover{ background:#1d4ed8; }
+
+.col-header-bar{ margin-bottom:6px; display:grid; grid-template-columns: calc(100% - 306px) 290px; gap:16px; }
+.step-title{ font-size:16px; color:#1e3a5f; font-weight:bold; padding:8px 12px; background:#eff6ff; border:2px solid #bfdbfe; border-radius:8px; display:flex; align-items:center; margin:0; }
+.right-col-header{ font-size:16px; font-weight:bold; color:#64748b; padding:8px 12px; background:#eff6ff; border:2px solid #bfdbfe; border-radius:8px; display:flex; align-items:center; justify-content:center; text-transform:uppercase; letter-spacing:0.5px; }
+.step1-box{ margin-bottom:6px; background:#ecfdf5; border:2px solid #dbeafe; border-radius:12px; padding:2px; display:flex; align-items:center; gap:6px; }
+.step1-title{ font-size:16px; font-weight:bold; color:#1e3a5f; white-space:nowrap; }
+.step1-select{ flex:1; padding:6px; border-radius:10px; border:2px solid #cbd5e1; font-size:16px; font-weight:normal; background:#fff; }
+
+/* ── LAYOUT 2 CỘT CỐ ĐỊNH CHỐNG VỠ ── */
+.simulator-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* CỘT TRÁI: KHUNG SIMULATOR ĐƯỢC CHIA THÀNH 2 DÒNG */
+.simulator {
+    position: relative !important; /* QUAN TRỌNG: Khóa mốc tọa độ (0,0) cho HotspotLayer không bị văng ra ngoài */
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    border: 2px solid #cbd5e1;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    min-height: 480px;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+}
+
+/* DÒNG 1: KHUNG CHỨA ẢNH TĨNH RIBBON */
+.simulator-row-1 {
+    width: 100% !important;
+    height: 170px !important;
+    max-height: 170px !important;
+    background: #f8fafc;
+    border-bottom: 2px solid #cbd5e1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden !important;
+    flex-shrink: 0;
+    box-sizing: border-box !important;
+}
+
+.simulator-row-1 img {
+    max-width: 100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    display: block !important;
+}
+
+/* DÒNG 2: VÙNG VĂN BẢN WORD MÔ PHỎNG VÀ HOTSPOT */
+.simulator-row-2 {
+    flex: 1;
+    width: 100% !important;
+    background: #f1f5f9;
+    padding: 12px;
+    position: relative;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box !important;
+}
+
+/* KHUNG TRANG VĂN BẢN WORD */
+.word-page-content {
+    background: #ffffff;
+    width: 100%;
+    max-width: 720px;
+    min-height: 100%;
+    padding: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #334155;
+    position: relative;
+    box-sizing: border-box;
+}
+
+/* CỘT PHẢI: RESULT PANEL CỐ ĐỊNH CHIỀU RỘNG */
+#resultPanel {
+    width: 290px !important;
+    flex: 0 0 290px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+}
+.hotspot{ position:absolute; cursor:pointer; box-sizing:border-box; z-index:10; pointer-events:auto; }
+.hotspot.debug{ border:2px dashed red; background:rgba(255,0,0,0.15); }
+.click-layer{ position:absolute; left:0; top:0; width:100%; height:100%; z-index:1; cursor:pointer; pointer-events:auto; }
+.coord-box{ margin:12px auto; background:#111827; color:#fff; padding:12px; border-radius:8px; font-size:14px; display:none; line-height:1.7; }
+.step-popup{ margin:10px auto; text-align:center; padding:8px 18px; border-radius:10px; font-weight:bold; font-size:18px; display:none; transition:all 0.2s ease; }
+.hint-btn{ display:inline-block; margin-left:16px; padding:6px 16px; background:#f59e0b; color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:bold; cursor:pointer; vertical-align:middle; transition:background 0.2s; }
+.hint-btn:hover{ background:#d97706; }
+.hint-overlay{ position:fixed; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:19999; display:flex; justify-content:center; align-items:center; }
+.hint-box{ background:#fff; border:3px solid #f59e0b; border-radius:14px; padding:20px 24px 18px; max-width:700px; width:90%; box-shadow:0 12px 40px rgba(0,0,0,0.35); position:relative; text-align:center; }
+.hint-box-title{ font-size:17px; font-weight:bold; color:#92400e; margin-bottom:12px; }
+.hint-box img{ max-width:100%; border-radius:8px; border:1px solid #fde68a; }
+.hint-close{ position:absolute; right:10px; top:8px; font-size:22px; cursor:pointer; color:#374151; }
+.hint-close:hover{ color:#dc2626; }
+.timeout-banner{ margin-bottom:10px; background:#fef2f2; border:2px solid #dc2626; border-radius:10px; padding:14px 18px; font-size:18px; font-weight:bold; color:#991b1b; text-align:center; display:none; }
+.result{ position:fixed; left:0; top:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; background:rgba(0,0,0,0.35); z-index:9999; pointer-events:none; }
+.result:empty{ display:none; }
+.result-box{ background:#ecfdf5; border:2px solid #16a34a; border-radius:12px; padding:24px 30px; min-width:min(500px,90vw); box-shadow:0 10px 30px rgba(0,0,0,0.25); pointer-events:auto; position:relative; max-height:80vh; overflow:auto; }
+.close-btn{ position:absolute; right:10px; top:8px; cursor:pointer; font-size:22px; color:#111; }
+.project-summary-box{ background:#fff3cd; border:3px solid #f59e0b; border-radius:14px; padding:28px 32px; min-width:min(560px,90vw); box-shadow:0 16px 50px rgba(0,0,0,0.35); pointer-events:auto; position:relative; max-height:85vh; overflow:auto; text-align:center; }
+.project-summary-box .close-btn{ display:none; }
+.project-summary-box.final-summary .close-btn{ display:none!important; }
+
+.result-step-box{ flex:1; min-height:0; }
+#resultPanel .step-popup{ display:none; margin:0; padding:8px 12px; border-radius:10px; font-weight:bold; font-size:16px; transition:all 0.2s ease; }
+.result-action-row{ display:flex; gap:8px; }
+.result-action-row button{ flex:1; }
+.result-placeholder{ display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:140px; background:#f8fafc; border:2px dashed #cbd5e1; border-radius:10px; color:#94a3b8; font-size:13px; font-weight:bold; gap:8px; text-align:center; padding:14px; }
+.result-placeholder span{ font-size:28px; }
+.result-img-box{ border:2px solid #16a34a; border-radius:10px; overflow:hidden; background:#fff; }
+.result-step-box .result-img-box img{ width:100%; max-height:280px; height:auto; display:block; }
+.result-final-box .result-img-box img{ width:100%; max-height:200px; height:auto; display:block; }
+.result-img-badge{ color:#fff; font-size:12px; font-weight:bold; padding:5px 12px; text-align:center; }
+.result-img-badge.badge-step{ background:#2563eb; }
+.result-img-badge.badge-final{ background:#16a34a; }
+#questionSelect option.locked-question{ color:#94a3b8; }
+
+@media (max-width:1023px){
+    .step1-select{ font-size:15px; padding:10px; }
+    .step-title, .right-col-header{ font-size:15px; }
+    .question-title{ font-size:17px; }
+}
+@media (max-width:767px){
+    body{ padding:10px; }
+    .step1-box{ flex-wrap:wrap; gap:10px; }
+    .start-btn{ min-width:120px; font-size:13px; }
+    .step1-select{ font-size:14px; padding:8px; }
+    .col-header-bar{ grid-template-columns:1fr; gap:6px; }
+    .right-col-header{ display:none; }
+    .simulator-wrapper{ flex-direction:column !important; gap:12px !important; }
+    #resultPanel{ width:100% !important; flex:1 1 auto !important; }
+    .result-step-box .result-img-box img{ max-height:140px; }
+    .result-final-box .result-img-box img{ max-height:200px; }
+    .step-popup{ font-size:15px; padding:10px 14px; }
+    .question-title{ font-size:16px; }
+    .top-header{ flex-wrap:wrap; gap:8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HỘP THOẠI HƯỚNG DẪN SỬ DỤNG -->
+<div class='guide-overlay' id='guideOverlay' onclick='closeGuide(event)'>
+  <div class='guide-box'>
+    <span class='guide-close' onclick='closeGuideBtn()'>&#10006;</span>
+    <div class='guide-title' style='font-size: 24px; margin-bottom: 15px;'> Welcome to Digital Informatics Community</div>
+    <div class='guide-title'>&#128218; HƯỚNG DẪN SỬ DỤNG GIAO DIỆN LUYỆN THI</div>
+    <div class='guide-subtitle'>&#9888; <u>Chú ý</u>: xem nhanh các mục <span style='color:#dc2626;'>1a</span>, <span style='color:#dc2626;'>2b, 3 và nút Training</span></div>
+
+    <h3>1. Di chuyển xuống cuối trang, thực hiện:</h3>
+    <p><strong class='highlight'>a) Bắt buộc chọn &ldquo;Phiên bản&rdquo; trước và &ldquo;Dự án sau, để bắt đầu luyện thi.&rdquo;</strong> </p>
+    <ul>
+      <li>Mặc định nút <strong>&ldquo;Training&rdquo;</strong> có hướng dẫn và có ghi nhớ thao tác nhanh.</li>
+      <li>Chọn <strong>&ldquo;Phiên bản&rdquo;</strong> chỉ được <u>1 lần duy nhất</u>.</li>
+      <li>Chọn <strong>&ldquo;Dự án&rdquo;</strong> <U>không nhất thiết</U> theo thứ tự từ 1 đến N.</li>
+    </ul>
+
+    <button class='guide-btn-close' onclick='closeGuideBtn()'>&#10003; Đã hiểu &mdash; Bắt đầu làm bài</button>
+  </div>
+</div>
+
+<div class='timeout-banner' id='timeoutBanner'>
+    &#9200; Đã hết 60 phút &mdash; Đồng hồ tạm dừng. Bạn vẫn có thể tiếp tục làm bài.
+</div>
+
+<!-- DÒNG TIÊU ĐỀ -->
+<div class='question-title' id='questionTitle'></div>
+
+<div class='step1-box'>
+    <button class='start-btn' id='startBtn' onclick='handleStartBtn()'>&#9654; Bắt đầu &#9201; 00:00</button>
+    <div class='step1-title'>Bước 1.</div>
+    <select class='step1-select' id='step1Select' onchange='checkStep1()'>
+        <option>- - Hãy chọn các gợi ý sau - -</option>
+        <option>Bôi đen văn bản khi: chọn một phần hoặc toàn bộ tài liệu + thao tác trên thẻ Home</option> 
+        <option>-Không bôi đen, thao tác từ Ribbon khi: Áp dụng toàn bộ tài liệu + thao tác khác thẻ Home.</option>
+        <option>-Không bôi đen, thao tác từ Ribbon khi: Hiển thị ngắt phần/tất cả kí tự ẩn.</option>
+        <option>-Không bôi đen, thao tác từ Ribbon khi: Tìm văn bản(Ctrl+F), tìm kiếm-thay thế (Ctrl+H), điều hướng(Ctrl+G), được sử dụng phím tắt.</option>
+        <option>-Không bôi đen khi: Click phải chuột trên đối tượng cần thực hiện.</option>
+        <option>Nháy **chọn đối tượng…** cần chỉnh sửa/thay đổi (gồm: danh sách, Bảng, đồ họa, References)</option>
+        <option>Nháy **chọn vị trí…** cần chèn (gồm: Ngắt phần, đánh dấu trang, Tiêu đề trang, File tài liệu, Bảng, đồ họa, chữ lớn đầu câu)</option>
+    </select>
+</div>
+
+<div class='col-header-bar'>
+    <div class='step-title' id='stepTitle'></div>
+    <div class='right-col-header' id='rightColHeader'>* Minh họa kết quả *</div>
+</div>
+
+<!-- KHUNG LÀM VIỆC TÁCH 2 CỘT CHUẨN -->
+<div class='simulator-wrapper'>
+    
+<!-- CỘT TRÁI: SIMULATOR0 CHIA THÀNH DÒNG 1 VÀ DÒNG 2 -->
+    <div class='simulator' id='simulator0'>
+        
+        <!-- DÒNG 1: RIBBON THAO TÁC BƯỚC -->
+        <div class='simulator-row-1' id='simulatorRowTop'>
+            <img id='stepRibbonImg' src='' alt='Ảnh Ribbon thao tác' style='display:none;'>
+        </div>
+
+        <!-- DÒNG 2: VÙNG VĂN BẢN WORD VÀ TƯƠNG TÁC -->
+        <div class='simulator-row-2' id='simulatorRowBottom'>
+            <div class='word-page-content' id='wordDocumentPage'>
+                <div id='wordDocBody'></div>
+            </div>
+        </div>
+
+ <!-- LỚP HOTSPOT PHỦ TOÀN BỘ KHUNG TỔNG #simulator0 -->
+        <div id='hotspotLayer' style='position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none; z-index:999;'></div>
+    </div>
+
+    <!-- CỘT PHẢI: RESULT PANEL -->
+    <div id='resultPanel'>
+        <!-- Dòng 1: minh họa bước vừa làm -->
+        <div class='result-step-box'>
+            <div class='result-placeholder' id='resultPlaceholder'>
+                <span>&#128433;&#65039;</span>
+                Chọn đúng -> hiển thị minh họa<br>bước vừa thực hiện.
+            </div>
+            <div class='result-img-box' id='resultImgBox' style='display:none;'>
+                <div class='result-img-badge badge-step' id='resultImgBadge'></div>
+                <img id='resultImg' src='' alt='Minh họa bước đúng'>
+            </div>
+        </div>
+        <!-- Dòng 2: cảnh báo đúng/sai -->
+        <div class='step-popup' id='stepPopup'></div>
+        <!-- Dòng 3: nút Clip + Hướng dẫn SD -->
+        <div class='result-action-row'>
+            <button class='btn-video' onclick='openVideo()'>&#127916; Clip bài tập</button>
+            <button class='btn-guide' onclick='openGuide()' id='guideBtn'>&#128218; Hướng dẫn SD</button>
+        </div>
+    </div>
+
+</div>
+
+<div class='coord-box' id='coordBox'></div>
+<div class='result' id='result'></div>
+
+<div class='top-header'>
+    <button class='home-btn' onclick='goHome()'>&#8592; Home</button>
+    <button class='btn-lang' id='modeBtn' onclick='toggleTestMode()'>&#128221; Training</button>
+    <select class='question-select' id='versionSelect' onchange='handleVersionChange(this.value)' style='width:120px;flex:none;'>
+        <option value='' selected disabled>- Phiên bản -</option>
+        <option value='2016'>Word 2016</option>
+        <option value='2019'>Word 2019</option>
+        <option value='2021'>Word 2021</option>
+        <option value='365'>Word 365</option>
+    </select>
+    <select class='question-select' id='projectSelect' onchange='handleProjectChange(this.value)' style='width:120px;flex:none;'>
+        <option value='' selected disabled>- Dự án -</option>
+        <option value='0'>Project 1</option>
+        <option value='1'>Project 2</option>
+        <option value='2'>Project 3</option>
+        <option value='3'>Project 4</option>
+        <option value='4'>Project 5</option>
+        <option value='5'>Project 6</option>
+        <option value='6'>Project 7</option>
+    </select>
+    <select class='question-select hidden-select' id='questionSelect' onchange='handleQuestionChange(this.value)' style='flex:1;'></select>
+    <button class='btn-lang' id='langBtn' onclick='toggleLang()'>&#127760; EN / VN</button>
+    <button class='btn-debug' id='debugBtn' onclick='toggleDebug()'>&#128204; Khung tọa độ</button>
+</div>
+
+<script>
+
+/* ===================== DỮ LIỆU ===================== */
+const DATA_2016 = [
+/* ===== PROJECT 1 ===== */
+[
+{title: 'Câu_New. Select the first paragraph and apply Bold formatting.',
+titleVi: 'Câu_New. Chọn đoạn văn bản đầu tiên và tô đậm.',
+correctStep1: 1, step1Group: 'A',imgResult1:'images/test1-p1-c1-da-buoc1.png', video:'video-link',
+steps: [
+{text: 'Thao tác bước 1. Nháy 3 lần chọn đoạn văn bản đầu tiên',img: 'images/v2test1-p1-c1-th-buoc2.png',imgResult: 'images/test1-p1-c1-da-buoc1.png',width: '100%', hotspot: { x: 113, y: 2, w: 55, h: 30 },   
+popupType: 'text-selection-64',
+popupAnswer: {
+	lineAboveText: '',
+	textParagraph: 'GROUP WRITING PROJECT',
+	lineBelowText: 'Nội dung tiếp theo của đoạn văn...',
+	isDoubleClick: false, isTripleClick: true, isDrag: false,
+	fontSize: { doan1: '18pt' } }},
+{text: 'Bước 2. Nháy chọn Thẻ ... cần Tô đậm',img: 'images/v2test1-p1-c1-th-buoc2.png',imgResult: 'images/v2test1-p1-c1-da-buoc2.png',width: '100%', hotspot: { x: 73, y: 3, w: 72, h: 36 },
+	pageEffect: { Home: true }},
+{text: 'Bước 3. Nháy chọn icon Bold (B) trên nhóm Font',img: 'images/v2test1-p1-c1-th-buoc3.png',imgResult: 'images/v2test1-p1-c1-da-buoc3.png',width: '100%', hotspot: { x: 209, y: 92, w: 32, h: 32 },
+	pageEffect: { bold: true }}
+	]
+},
+
+{ title:' Câu 1. <b>Remove</b> the <u>section break</u> in the document.',
+titleVi:' Câu 1. <b>Xóa</b> <u>section break</u> trong tài liệu.',
+correctStep1:3, step1Group: 'A', imgResult1:'images/test1-p1-c1-da-buoc1.png', video:'video-link',
+steps:[
+{ text:'Bước 2. Nháy chọn Thẻ ... cần hiển thị ngắt phần', img:'images/test1-p1-c1-th-buoc2.png', imgResult:'images/test1-p1-c1-da-buoc2.png', width:'100%', hotspot:{x:62,y:3,w:55,h:30 }},
+{ text:'Bước 3. Nháy chọn icon/lệnh cần hiển thị ngắt phần', img:'images/test1-p1-c1-th-buoc3.png', imgResult:'images/test1-p1-c1-da-buoc3.png', width:'100%', hotspot:{x:597,y:30,w:32,h:35}},
+{ text:'Bước 4. Nháy chuột chọn đúng vị trí đầu ngắt phần và phím xóa', imgResult:'images/test1-p1-c1-th-buockq.png', imgFinal:'images/test1-p1-c1-th-buockq.png', width:'100%', hotspot:{x:737,y:24,w:35,h:35},
+popupType: 'section-break',
+popupAnswer: {
+    doan1: '• Non-fiction\n     o	Sections or chapters\n     o	Areas of expertise\n     o	Separate research topics\n     o	Types of information, such as general information or technical details',
+    doan2: ' ',
+    doan3: 'Các định dạng nâng cao giúp tối ưu hóa việc quản lý trang và phân đoạn văn bản.',
+    breakLabel: 'Section Break (Next Page)',
+    actionRequired: 'delete-break', 
+    fontSize: {doan1: '14pt',doan2: '14pt',doan3: '14pt',breakLine: '14pt'}
+	}},
+{ text:'Ghi chú nhanh: các thao tác hiển thị ngắt phần -thuộc nhóm Paragraph thẻ Home-', imgResult:'images/test1-p1-c1-th-buockq.png', imgFinal:'images/test1-p1-c1-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'chọn icon Show/Hide Paragraph Mark' ,
+	ribbonSub: 'vị trí: trước ngắt phần' ,
+	ribbonSubSub: 'nhấn phím Delete'  }}
+      ]
+},
+
+{ title:' Câu 2. Insert <b>Figure</b> <u>Label</u> <u>Caption</u> text <b>. MOS WORD 2016</b> <u>below</u> the <b>picture</b> on the page 1.', 
+titleVi:'Câu 2. Chèn <u>Caption</u> <u>nhãn</u> <b>Figure</b> có nội dung <b>. MOS WORD 2016</b> <u>bên dưới</u> <b>hình ảnh</b> ở trang 1.',
+correctStep1:6, step1Group: 'A', imgResult1:'images/test1-p1-c2-da-buoc1.png', video:'video-link',
+steps:[
+{ text:'Thao tác bước 1. Nháy chọn hình ảnh cần tạo Chú thích', img:'images/test1-p1-c2-th-buoc1.png', imgResult:'images/test1-p1-c2-da-buoc1.png', width:'100%', hotspot:{x:410,y:238,w:135,h:134 }}, 
+{ text:'Bước 2. Nháy chọn Thẻ ... cần chèn Chú thích', img:'images/test1-p1-c2-th-buoc2.png', imgResult:'images/test1-p1-c2-da-buoc2.png', width:'100%', hotspot:{x:337,y:1,w:80,h:30} },
+{ text:'Bước 3. Nháy chọn lệnh Chú thích cần chèn ', img:'images/test1-p1-c2-th-buoc3.png', imgResult:'images/test1-p1-c2-da-buoc3.png', width:'100%', hotspot:{x:1.7,y:28,w:60,h:85} },
+{ text:'Bước 4. Thiết lập theo yêu cầu - chọn xác nhận', imgResult:'images/test1-p1-c2-th-buockq.png', imgFinal:'images/test1-p1-c2-th-buockq.png', width:'100%', hotspot:{x:5,y:28,w:65,h:85},
+popupType:   'caption',
+popupAnswer: {
+	captionText:  '. MOS WORD 2016',
+	labelFigure:  true,
+	posBelow:     true,
+	excludeLabel: false }},
+{text:'Ghi chú nhanh: các thao tác chèn chú thích -thuộc nhóm Caption thẻ References-', imgResult:'images/test1-p1-c2-th-buockq.png', imgFinal:'images/test1-p1-c2-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_References',
+	ribbonCmd: 'Insert Caption',
+	ribbonSub: 'mục Caption: nhập văn bản' ,
+	ribbonSubSub: 'nhãn: Figure'   }}
+	]
+},
+
+{ title:' Câu 3. On page 1, <b>configure</b> the <u>table</u> so that the width of <b>all columns equally between</b> them. Accept all other default settings.',
+titleVi:'Câu 3. Trên trang 1, <b>thiết lập</b> <u>bảng</u> để chiều rộng của tất cả các cột là <b>Distributed Columns</b>. Giữ nguyên các thiết lập mặc định khác.',
+correctStep1:6, step1Group: 'A', imgResult1:'images/test1-p1-c3-da-buoc1.png', video:'video-link',
+steps:[
+{ text:'Thao tác bước 1. Nháy chọn bảng cần điều chỉnh theo cột (chọn bảng minh họa bên dưới)', img:'images/test1-p1-c3-th-buoc2.png', imgResult:'images/test1-p1-c3-da-buoc1.png', width:'100%', hotspot:{x:572,y:28,w:65,h:25},
+popupType: 'table-row-selection',
+popupAnswer: {
+	tableTitle: 'Participants',
+    	targetTable: true, 
+    	tableData: [ 
+     		['Name', 'Role', 'Quantity'],
+		['Margaret','',''],
+     		['Margaret',   'Author', '3'],
+     		['Rory Seiler','Author','4'],
+     		['Juanita Blackwell','Editor','7'],  
+     		['Tom Liddell','Researcher','2'],  
+     		['Delbert Thames','Artwork','8'],
+     		['Mia Hess','Researcher','9'],  
+     		['Ethan','Admin','1'],  ]
+
+	}},
+{ text:'Bước 2. Nháy chọn Tools ... cần điều chỉnh bảng', img:'images/test1-p1-c3-th-buoc2.png', imgResult:'images/test1-p1-c3-da-buoc2.png', width:'100%', hotspot:{x:572,y:28,w:65,h:25} },
+{ text:'Bước 3. Nháy chọn lệnh điều chỉnh theo chiều rộng cột', img:'images/test1-p1-c3-th-buoc3.png', imgResult:'images/test1-p1-c3-th-buockq.png', imgFinal:'images/test1-p1-c3-th-buockq.png', width:'100%', hotspot:{x:149,y:87,w:140,h:35} },
+{ text:'Ghi chú nhanh: các thao tác căn chỉnh cột -thuộc nhóm Cell Size thẻ Tools Table_Layout-', imgResult:'images/test1-p1-c3-th-buockq.png', imgFinal:'images/test1-p1-c3-th-buockq.png', width:'100%', hotspot:{x:149,y:87,w:140,h:35},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'Tools Table_Layout',
+	ribbonCmd: 'Distribute Columns'}}
+       ]
+},
+
+{ title:' Câu 4. Apply a <b>Reflection</b> <u>effect</u> (Full Reflection, touching) to the <u>title</u> of the document <b>Group Writing Project</b> <br>(<u>Chú ý</u>: xác định rõ văn bản là Title/ văn bản thường/ WordArt -> sử dụng hiệu ứng cho phù hợp).',
+titleVi:'Câu 4. Áp dụng <u>Effect</u> <b>Reflection</b> cho tiêu đề tài liệu <b>Group Writing Project</b>.',
+correctStep1:1, step1Group: 'A', imgResult1:'images/test1-p1-c4-da-buoc1.png', video:'video-link',
+steps:[
+{ text:'Thao tác bước 1. Nháy chọn văn bản cần tạo hiệu ứng', img:'images/test1-p1-c4-th-buoc2.png', imgResult:'images/test1-p1-c4-da-buoc1.png', width:'100%', hotspot:{x:113,y:2,w:55,h:30},
+popupType: 'text-selection',
+popupAnswer: {
+    	lineAboveText: '', 
+    	lineBelowText: '', 
+    	textParagraph: 'GROUP WRITING \nPROJECT',
+	textParagraph2: 'Project Name:     MOS WORD 2016\nDue Date:     28/8/2020',
+    	targetParagraph: 'main-text', 
+    	isTripleClick: false,
+    	isDoubleClick: false,
+    	isDrag: true,	
+	fontSize: { dong1: '15pt', dong2: '15pt', doan1: '28pt', doan2: '16pt' }
+	}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần tạo hiệu ứng văn bản', img:'images/test1-p1-c4-th-buoc2.png', imgResult:'images/test1-p1-c4-da-buoc2.png', width:'100%', hotspot:{x:55,y:3,w:65,h:27} },
+{ text:'Bước 3. Nháy chọn nhóm lệnh hiệu ứng văn bản ▼', img:'images/test1-p1-c4-th-buoc3.png', imgResult:'images/test1-p1-c4-da-buoc3.png', width:'100%', hotspot:{x:301,y:64,w:38,h:35} },
+{ text:'Bước 4. Nháy chọn Tên và kiểu hiệu ứng', img:'images/test1-p1-c4-th-buoc4.png', imgResult:'images/test1-p1-c4-th-buockq.png', width:'100%', imgFinal:'images/test1-p1-c4-th-buockq.png', hotspot:{x:321,y:339,w:152,h:31 },
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Effectstext.png',
+	stage1Label: 'nhóm Font',
+	stage2Label: 'lệnh',
+	menuWidth: '300px',
+       	hotspots: [
+           { x: 8, y: 107, w: 39, h: 41, label: 'Tight Reflection, touching' },
+          { x: 8, y: 163, w: 39, h: 41, label: 'Tight Reflection, touching(có khoảng cách)' },
+           { x: 64, y: 107, w: 39, h: 41, label: 'Half Reflection, touching' },
+           { x: 121, y: 107, w: 39, h: 41, label: 'Full Reflection, touching' }
+       		],
+       correctIndex: 3   }},
+{ text:'Ghi chú nhanh: các thao tác thêm hiệu ứng văn bản -thuộc nhóm Font thẻ Home-', imgResult:'images/test1-p1-c4-th-buockq.png', imgFinal:'images/test1-p1-c4-th-buockq.png', width:'100%', hotspot:{x:437,y:271,w:55,h:34},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'mởR Text Effects And Typography',
+	ribbonSub: 'hiệu ứng: Reflection',
+	ribbonSubSub: 'kiểu: theo yêu cầu' }}
+        ]
+},
+
+{ title:' Câu 5. <u>Between</u> the <b>Topic: Ron Wiki</b> heading and number lists of <b>Topic: Vampires</b> heading, <u>insert</u> a <b>diagram</b> <u>named</u> <b>Vertical Box List</b> and insert text <b>Need to build more and more!</b> only.',
+ titleVi:'Câu 5. Giữa tiêu đề <b>Topic: Ron Wiki</b> và danh sách đánh số của tiêu đề <b>Topic: Vampires</b>, <b>chèn SmartArt</b> <u>Vertical Box List</u> và chỉ nhập nội dung <b>Need to build more and more!</b>.',
+correctStep1:7, step1Group: 'A', imgResult1:'images/test1-p1-c5-da-buoc1.png', video:'video-link',
+steps:[
+{ text:'Thao tác bước 1. Nháy chuột chọn đúng vị trí cần chèn sơ đồ', img:'images/test1-p1-c5-th-buoc1.png', imgResult:'images/test1-p1-c5-da-buoc1.png', width:'100%', hotspot:{x:0,y:257,w:566,h:23}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần chèn sơ đồ', img:'images/test1-p1-c5-th-buoc2.png', imgResult:'images/test1-p1-c5-da-buoc2.png', width:'100%', hotspot:{x:108.7,y:0.8,w:54.5,h:25} },
+{ text:'Bước 3. Nháy chọn lệnh chèn sơ đồ', img:'images/test1-p1-c5-th-buoc3.png', imgResult:'images/test1-p1-c5-da-buoc3.png', width:'100%', hotspot:{x:298,y:30,w:100,h:30} },
+{ text:'Bước 4. Trong thư viện, nháy chọn Tên và kiểu sơ đồ (theo chiều ngang)', img:'images/test1-p1-c5-th-buoc4.png', imgResult:'images/test1-p1-c5-da-buoc5.png', width:'100%', hotspot:{x:250,y:130,w:130,h:30 },
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Smartartlist.png',
+	stage1Label: 'nhóm Illustrations',
+	stage2Label: 'lệnh',
+	menuWidth: '',
+       	hotspots: [
+           { x: 12, y: 67, w: 71, h: 53, label: 'Vertical Bullet List (sơ đồ ngang)' },
+           { x: 84, y: 67, w: 70, h: 53, label: 'Vertical Box List (sơ đồ ngang)' },
+           { x: 161, y: 67, w: 64, h: 53, label: 'Vertical Bracket List (sơ đồ ngang)' }
+       		],
+       correctIndex: 1   }},
+{ text:'Bước 5. Nhập văn bản theo yêu cầu (còn lại nhấn phím Delete xóa)', imgResult:'images/test1-p1-c5-th-buockq.png', imgFinal:'images/test1-p1-c5-th-buockq.png', width:'100%', hotspot:{x:359,y:285,w:80,h:65},
+popupType: 'smartart-text',
+popupAnswer: {
+    	ans: ['Need to build more and more!'] }},
+{ text:'Ghi chú nhanh: các thao tác chèn sơ đồ -thuộc nhóm Illustrations thẻ Insert-', imgResult:'images/test1-p1-c5-th-buockq.png', imgFinal:'images/test1-p1-c5-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Insert',
+	ribbonCmd: 'SmartArt',
+	ribbonSub: 'thư viện: List', 
+	ribbonSubSub: 'kiểu: Vertical Box List' ,
+	ribbonSubSubSub: 'nhập văn bản theo yêu cầu'}}
+]
+},
+
+{ title:' Câu 6. <b>Restart</b> <u>number list below</u> the heading <b>Topic: Ron Wiki</b> at 1.',
+titleVi:'Câu 6. <b>Khởi động lại</b> <u>number list bên dưới</u> tiêu đề <b>Topic: Ron Wiki</b> bắt đầu từ <b>1</b>.', 
+correctStep1:6, step1Group: 'A', imgResult1:'images/test1-p1-c6-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chuột chọn danh sách số cần đặt lại', img:'images/test1-p1-c6-th-buoc2.png', imgResult:'images/test1-p1-c6-da-buoc1.png', width:'100%', hotspot:{x:126,y:4,w:55,h:30},
+popupType: 'text-selection',
+popupAnswer: {
+	lineAboveText: 'Topic: Ron Wiki', 
+    	lineBelowText: '',
+    	textParagraph: '4. Enter wiki item',
+	hideParagraph2: true,
+    	isDoubleClick: true,
+    	isTripleClick: false,
+    	isDrag: false,
+	fontSize: { dong1: '18pt', dong2: '18pt', doan1: '14pt', doan2: '14pt' },
+    	targetWord: '4'}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần đặt lại danh sách', img:'images/test1-p1-c6-th-buoc2.png', imgResult:'images/test1-p1-c6-da-buoc2.png', width:'100%', hotspot:{x:56,y:3,w:66.5,h:27.5} }, 
+{ text:'Bước 3. Nháy chọn nhóm icon danh sách ▼ và lệnh cần đặt lại', img:'images/test1-p1-c6-th-buoc3.png', imgResult:'images/test1-p1-c6-da-buoc4.png', width:'100%', hotspot:{x:444,y:35,w:39,h:33 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Numbering.png',
+	stage1Label: 'nhóm Paragraph',
+	stage2Label: 'lệnh',
+	menuWidth: '320px',
+       	hotspots: [
+           { x: 0, y: 321, w: 151, h: 25, label: 'Define New Number Format' },
+           { x: 0, y: 300, w: 150, h: 25, label: 'Change List Level' },
+           { x: 0, y: 340, w: 151, h: 23, label: 'Set Number Value' }
+       		],
+       correctIndex: 2   }},
+{ text:'Bước 4. Thiết lập danh sách theo yêu cầu - chọn xác nhận', imgResult:'images/test1-p1-c6-th-buockq.png', imgFinal:'images/test1-p1-c6-th-buockq.png', width:'100%', hotspot:{x:354,y:441,w:210,h:25}, 
+popupType:   'set-numbering',
+popupAnswer: {
+	startNewList:         true,   
+	continueFromPrevious: false,   
+	advanceValue:         false,   
+	setValue:             1 }},
+{ text:'Ghi chú nhanh: các thao tác đặt lại danh sách -thuộc nhóm Paragraph thẻ Home-', imgResult:'images/test1-p1-c6-th-buockq.png', imgFinal:'images/test1-p1-c6-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'mở rộng Numbering',
+	ribbonSub: 'Set Numbering Value',  
+	ribbonSubSub: 'danh sách: nhập theo yêu cầu'   }}
+] 
+},
+
+{ title:' Câu 7. <u>Link</u> the <b>picture</b> on page 1 to <u>create</u> a new email to <b>welcome@microsoft.com</b> with <u>subject</u> <b>Hello World</b>.',
+titleVi:'Câu 7. Tạo <u>Hyperlink</u> cho <b>hình ảnh</b> ở trang 1 để <u>tạo Email</u> mới gửi đến <b>welcome@microsoft.com</b> với ,<u>Subject</u> <b>Hello World</b>.', 
+correctStep1:6, step1Group: 'A', imgResult1:'images/test1-p1-c7-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chọn hình ảnh cần liên kết', img:'images/test1-p1-c7-th-buoc1.png', imgResult:'images/test1-p1-c7-da-buoc1.png', width:'100%', hotspot:{x:412,y:238,w:135,h:134 }}, 
+{ text:'Bước 2. Nháy chọn Thẻ ... liên kết Email', img:'images/test1-p1-c7-th-buoc2.png', imgResult:'images/test1-p1-c7-da-buoc2.png', width:'100%', hotspot:{x:119,y:0,w:61,h:29} }, 
+{ text:'Bước 3. Nháy chọn lệnh liên kết và Mục liên kết Email', img:'images/test1-p1-c7-th-buoc3.png', imgResult:'images/test1-p1-c7-da-buoc4.png', width:'100%', hotspot:{x:2,y:27,w:110,h:27 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Hyperlink.png',
+	stage1Label: 'nhóm Link',
+	stage2Label: 'lệnh',
+	menuWidth: '',
+       	hotspots: [
+           { x: 9, y: 192, w: 78, h: 57, label: '' },
+           { x: 7, y: 130, w: 78, h: 57, label: '' },
+           { x: 7, y: 260, w: 78, h: 66, label: '' }
+       		],
+       correctIndex: 2   }},
+{ text:'Bước 4. Thiết lập liên kết theo yêu cầu - chọn xác nhận', imgResult:'images/test1-p1-c7-th-buockq.png', imgFinal:'images/test1-p1-c7-th-buockq.png', width:'100%', hotspot:{x:3,y:301,w:70,h:65}, 
+popupType: 'hyperlink',
+popupAnswer: {
+	linkEmail:    true,
+	emailAddress: 'welcome@microsoft.com',
+	emailSubject: 'Hello World' } } ,
+{ text:'Ghi chú nhanh: các thao tác liên kết hình ảnh -thuộc nhóm Links thẻ Insert-', imgResult:'images/test1-p1-c7-th-buockq.png', imgFinal:'images/test1-p1-c7-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Insert',
+	ribbonCmd: 'Hyperlink',
+	ribbonSub: 'mục: E-mail Address', 
+	ribbonSubSub: 'ô Address: nhập địa chỉ Email',
+	ribbonSubSubSub: 'ô Subject: nhập chủ đề' }}
+	] 
+},
+],
+
+/* ===== PROJECT 2 ===== test x thiếu popup*/
+[
+{ title:' Câu 1. <b>Stop</b> <u>tracking</u> any changes in the document.',
+titleVi:'Câu 1. <b>Tắt</b> <u>Tracking</u> cho mọi thay đổi trong tài liệu.',
+correctStep1:2, step1Group: 'A', imgResult1:'images/test1-p1-c1-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2. Nháy chọn Thẻ ... cần dừng theo dõi', img:'images/test1-p2-c1-th-buoc2.png', imgResult:'images/test1-p2-c1-da-buoc2.png', width:'100%', hotspot:{x:509,y:3,w:70,h:30} }, 
+{ text:'Bước 3. Nháy chọn nhóm lệnh ▼ và lệnh dừng theo dõi', img:'images/test1-p2-c1-th-buoc3.png', imgResult:'images/test1-p2-c1-th-buockq.png', width:'100%', hotspot:{x:5,y:71,w:66,h:42 },
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Tracchange.png',
+	stage1Label: 'nhóm Tracking',
+	stage2Label: 'lệnh',
+	menuWidth: '240px',
+       	hotspots: [
+           { x: 0, y: 0, w: 131, h: 24, label: '' },
+           { x: 0, y: 25, w: 131, h: 24, label: '' }
+       		],
+       correctIndex: 0   }},
+{ text:'Ghi chú nhanh: các thao tác dừng thay đổi tài liệu -thuộc nhóm Tracking thẻ Review-', imgResult:'images/test1-p2-c1-th-buockq.png', imgFinal:'images/test1-p2-c1-th-buockq.png', width:'100%', hotspot:{x:0,y:151,w:120,h:35},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Review',
+	ribbonCmd: 'mở rộng Track Changes',
+	ribbonSub: 'Track Changes' }}
+  ] 
+},
+
+{ title:' Câu 2. Change the format of the text <b>Satya Nadella</b> at the <u>beginning</u> of the document to <u>Title</u>.',
+titleVi:'Câu 2. Thay đổi <u>Styles</u> của văn bản <b>Satya Nadella</b> ở đầu tài liệu thành <u>Title</u>.', 
+correctStep1:1, step1Group: 'A', imgResult1:'images/test1-p2-c2-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chọn văn bản cần thay đổi', img:'images/test1-p2-c2-th-buoc2.png', imgResult:'images/test1-p2-c2-da-buoc1.png', width:'100%', hotspot:{x:60,y:2,w:57,h:30},
+popupType: 'text-selection',
+popupAnswer: {
+	lineAboveText: '', 
+    	lineBelowText: 'CEO AND FOUDER',
+    	textParagraph: 'SATYA NADELLA',
+    	textParagraph2: 'OBJECTIE',
+    	isDoubleClick: false,
+    	isTripleClick: true,
+    	isDrag: false,
+	fontSize: { dong1: '14pt', dong2: '18pt', doan1: '24pt', doan2: '18pt' }
+	}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần thay đổi kiểu văn bản', img:'images/test1-p2-c2-th-buoc2.png', imgResult:'images/test1-p2-c2-da-buoc2.png', width:'100%', hotspot:{x:60,y:2,w:58.5,h:26.5} }, 
+{ text:'Bước 3. Nháy chọn mở rộng kiểu ▼ và kiểu văn bản', img:'images/test1-p2-c2-th-buoc3.png', imgResult:'images/test1-p2-c2-th-buockq.png', width:'100%', hotspot:{x:535,y:76,w:25,h:25 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Styletext.png',
+	stage1Label: 'nhóm Styles',
+	stage2Label: 'lệnh',
+	menuWidth: '',
+       	hotspots: [
+           { x: 218, y: 62, w: 69, h: 61, label: 'Intense Emphasis' },
+           { x: 287, y: 1, w: 73, h: 61, label: 'Title' },
+           { x: 144, y: 1, w: 73, h: 62, label: 'Heading 1' }
+       		],
+       correctIndex: 1   }},
+{ text:'Ghi chú nhanh: các thao tác định dạng văn bản -thuộc nhóm Styles thẻ Home-', imgResult:'images/test1-p2-c2-th-buockq.png', imgFinal:'images/test1-p2-c2-th-buockq.png', width:'100%', hotspot:{x:485,y:31,w:80,h:60},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'mở rộng Styles văn bản',
+	ribbonSub: 'kiểu: Title'}}
+ ] 
+},
+
+{ title:' Câu 3. <b>Remove</b> the <u>background color</u> of the document.',
+titleVi:'Câu 3. <b>Xóa</b> <u>màu nền</u> của tài liệu.', 
+correctStep1:2, step1Group: 'A', imgResult1:'images/test1-p1-c1-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2. Nháy chọn Thẻ ... cần loại bỏ màu nền', img:'images/test1-p2-c3-th-buoc2.png', imgResult:'images/test1-p2-c3-da-buoc2.png', width:'100%', hotspot:{x:193,y:2,w:60,h:27.5} }, 
+{ text:'Bước 3. Nháy chọn nhóm lệnh ▼ và Tên màu nền', img:'images/test1-p2-c3-th-buoc3.png', imgResult:'images/test1-p2-c3-th-buockq.png', imgFinal:'images/test1-p2-c3-th-buockq.png',width:'100%', hotspot:{x:326,y:36,w:55,h:75 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Pagecolor.png',
+	stage1Label: 'nhóm Page Background',
+	stage2Label: 'lệnh',
+	menuWidth: '320px',
+       	hotspots: [
+           { x: 24, y: 155, w: 100, h: 20, label: '' },
+           { x: 24, y: 181, w: 100, h: 20, label: '' },
+           { x: 24, y: 204, w: 100, h: 20, label: '' }
+       		],
+       correctIndex: 0   }},
+{ text:'Ghi chú nhanh: các thao tác loại bỏ màu nền -thuộc nhóm Page Background thẻ Design-', imgResult:'images/test1-p2-c3-th-buockq.png', imgFinal:'images/test1-p2-c3-th-buockq.png', width:'100%', hotspot:{x:326,y:266,w:100,h:32},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Design',
+	ribbonCmd: 'mở rộng Page Color',
+	ribbonSub: 'màu: No Color' }}
+ ] 
+},
+
+{ title:' Câu 4. <u>Configure Word</u> to <b>hide spelling errors in this document only</b>.',
+titleVi:'Câu 4. Thiết lập Word thành <b>hide spelling errors in this document only</b>.', 
+correctStep1:2, step1Group: 'A', imgResult1:'images/test1-p1-c1-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2. Nháy chọn Thẻ ... cần thiết lập lỗi chính tả', img:'images/test1-p2-c4-th-buoc2.png', imgResult:'images/test1-p2-c4-da-buoc2.png', width:'100%', hotspot:{x:4.8,y:1.3,w:52,h:29} }, 
+{ text:'Bước 3. Nháy chọn lệnh tùy chỉnh và mục cần thiết lập lỗi', img:'images/test1-p2-c4-th-buoc3.png', imgResult:'images/test1-p2-c4-da-buoc4.png', width:'100%', hotspot:{x:1,y:414,w:103,h:29 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Mucoption.png',
+	stage1Label: 'nhóm Option',
+	stage2Label: 'lệnh',
+	menuWidth: '280px',
+       	hotspots: [
+           { x: 6, y: 66, w: 100, h: 28, label: '' },
+           { x: 6, y: 93, w: 100, h: 27, label: '' },
+           { x: 7, y: 173, w: 100, h: 29, label: '' }
+       		],
+       correctIndex: 1   }},
+{ text:'Bước 4. Thiết lập word theo yêu cầu - chọn xác nhận', imgResult:'images/test1-p2-c4-th-buockq.png', imgFinal:'images/test1-p2-c4-th-buockq.png', width:'100%', hotspot:{x:178,y:160,w:80,h:32},
+popupType:   'spelling-grammar',   
+popupAnswer: {
+ 		checkSpelling:    false,
+ 		markGrammar:      false,
+ 		confusedWords:    false,
+ 		checkGrammar:     false,
+ 		writingStyleGrammar:      true,
+ 		writingStyleGrammarStyle: false,
+		hideSpellingOnly: true,
+		hideGrammarOnly: false} },
+{ text:'Ghi chú nhanh: các thao tác thiết lập Word -thuộc nhóm Option thẻ File-', imgResult:'images/test1-p2-c4-th-buockq.png', imgFinal:'images/test1-p2-c4-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_File',
+	ribbonCmd: 'Option',
+	ribbonSub: 'danh mục: Proofing',
+	ribbonSubSub: 'mục: Exceptions for',
+	ribbonSubSubSub: 'chọn hide spelling errors'}}
+  ] 
+},
+
+{ title:' Câu 5. <u>Inspect</u> the document and <u>remove all</u> <b>custom XML data</b>.',
+titleVi:'Câu 5. <b>Kiểm tra tài liệu và xóa tất cả</b> <u>custom XML data</u>.', 
+correctStep1:2, step1Group: 'A', imgResult1:'images/test1-p1-c1-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2. Nháy chọn Thẻ ... cần kiểm tra tài liệu', img:'images/test1-p2-c5-th-buoc2.png', imgResult:'images/test1-p2-c5-da-buoc2.png', width:'100%', hotspot:{x:4,y:1,w:45,h:30} }, 
+{ text:'Bước 3. Nháy chọn lệnh chứa thông tin tài liệu', img:'images/test1-p2-c5-th-buoc3.png', imgResult:'images/test1-p2-c5-da-buoc3.png', width:'100%', hotspot:{x:1.8,y:30,w:101,h:36 }}, 
+{ text:'Bước 4. Nháy chọn nhóm lệnh ▼ và lệnh kiểm tra tài liệu', img:'images/test1-p2-c5-th-buoc4.png', imgResult:'images/test1-p2-c5-da-buoc5.png', width:'100%', hotspot:{x:144,y:200,w:85,h:82 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Inspect.png',
+	stage1Label: 'nhóm Info',
+	stage2Label: 'lệnh',
+	menuWidth: '',
+       	hotspots: [
+           { x: 0, y: 0, w: 217, h: 57, label: '' },
+           { x: 0, y: 60, w: 217, h: 54, label: '' },
+           { x: 0, y: 118, w: 217, h: 56, label: '' }
+       		],
+       correctIndex: 0   }},
+{ text:'Bước 5. Thiết lập tài liệu theo yêu cầu - chọn xác nhận và xóa tất cả', imgResult:'images/test1-p2-c5-th-buockq.png', imgFinal:'images/test1-p2-c5-th-buockq.png', width:'100%', hotspot:{x:176,y:252,w:220,h:55},
+popupType:   'doc-inspect',
+popupAnswer: {
+	comments:          false,
+	documentProps:     false,
+	macros:            false,
+	collapsedHeadings: false,
+	customXmlData:     true,
+	headers:           false,
+	hiddenText:        false,
+	invisibleContent:  false } },
+{ text:'Ghi chú nhanh: các thao tác kiểm tra tài liệu -thuộc nhóm Info thẻ File-', imgResult:'images/test1-p2-c5-th-buockq.png', imgFinal:'images/test1-p2-c5-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_File',
+	ribbonCmd: 'Info',
+	ribbonSub: 'mở rộng Check for Issues' ,
+	ribbonSubSub: 'mục kiểm tra: Inspect Document' ,
+	ribbonSubSubSub: 'chọn thông tin cần kiểm tra-kiểm tra-xóa' }}
+   ] 
+ },
+],
+
+/* ===== PROJECT 3 ===== */
+[
+{ title:' Câu 1. <b>Change</b> <u>line spacing</u> for the entire document to <u>1.25 lines</u>.',
+titleVi:'Câu 1. <b>Thay đổi</b> <u>line spacing</u> của toàn bộ tài liệu thành <u>1.25 lines</u>.', 
+correctStep1:1, step1Group: 'A', imgResult1:'images/test1-p3-c1-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2(Cách 2 thay Ctrl+A). Nháy chọn Thẻ ... cần bôi đen toàn bộ tài liệu', img:'images/test1-p3-c1-th-buoc2.png', imgResult:'images/test1-p3-c1-da-buoc2.png', width:'100%', hotspot:{x:52,y:5.5,w:60,h:25} }, 
+{ text:'Bước 3(Cách 2 thay Ctrl+A). Nháy chọn nhóm lệnh ▼ và lệnh bôi đen tài liệu', img:'images/test1-p3-c1-th-buoc3.png', imgResult:'images/test1-p3-c1-da-buoc4.png', width:'100%', hotspot:{x:527,y:74,w:64,h:26 },
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Select.png',
+	stage1Label: 'nhóm Editing',
+	stage2Label: 'lệnh',
+	menuWidth: '320px',
+       	hotspots: [
+           { x: 0, y: -1, w: 150, h: 25, label: '' },
+           { x: 0, y: 25, w: 150, h: 25, label: '' },
+           { x: 0, y: 51, w: 150, h: 25, label: '' }
+       		],
+       correctIndex: 0   }},
+{ text:'Bước 4. Nháy chọn nhóm lệnh ▼ và lệnh thay đổi khoảng cách', img:'images/test1-p3-c1-th-buoc6.png', imgResult:'images/test1-p3-c1-da-buoc7.png', width:'100%', hotspot:{x:503,y:65,w:40,h:33 },
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Linespacing.png',
+	stage1Label: 'nhóm Paragraph',
+	stage2Label: 'lệnh',
+	menuWidth: '280px',
+       	hotspots: [
+           { x: 23, y: 145, w: 150, h: 21, label: '' },
+           { x: 23, y: 169, w: 150, h: 21, label: '' },
+           { x: 24, y: 194, w: 150, h: 21, label: '' }
+       		],
+       correctIndex: 0   }},
+{ text:'Bước 5. Thiết lập thay đổi khoảng cách dòng theo yêu cầu - chọn xác nhận', imgResult:'images/test1-p3-c1-th-buockq.png', imgFinal:'images/test1-p3-c1-th-buockq.png', width:'100%', hotspot:{x:457,y:61,w:50,h:32},
+popupType:   'paragraph-spacing',  
+popupAnswer: {
+ 		alignLeft:true,       alignCenter:false, alignRight:false, alignJustified:false,
+ 		outlineBodyText:true, outlineLevel1:false, outlineLevel2:false,
+ 		left:0,  right:0,
+ 		specialNone:false, specialFirstLine:false, specialHanging:false,
+ 		by:1.27,
+ 		before:0, after:0,
+	lsSingle:false, ls15lines:false, lsDouble:false,
+ 	lsAtLeast:false, lsExactly:false, lsMultiple:true,
+ 	at:1.25} },
+{ text:'Ghi chú nhanh: các thao tác bôi đen tài liệu -thuộc nhóm Editing thẻ Home-', imgResult:'images/test1-p3-c1-th-buockq.png', imgFinal:'images/test1-p3-c1-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'mở rộng Select',
+	ribbonSub: 'Select All'}},
+{ text:'Ghi chú nhanh: các thao tác thay đổi khoảng cách dòng -thuộc nhóm Paragraph thẻ Home-', imgResult:'images/test1-p3-c1-th-buockq.png', imgFinal:'images/test1-p3-c1-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'mởR Line And Paragraph Spacing',
+	ribbonSub: 'khoảng cách: Line Spacing Option', 
+	ribbonSubSub: 'mục Line spacing: Multiple', 
+	ribbonSubSubSub: 'mục At: nhập số' }}
+ ] 
+},
+
+{ title:' Câu 2. <b>Change</b> the <u>alignment</u> of the entire document to <u>Justified</u>.',
+titleVi:'Câu 2. <b>Thay đổi</b> <u>Alignment</u> cho toàn bộ tài liệu thành <u>Justified</u>.', 
+correctStep1:1, step1Group: 'A', imgResult1:'images/test1-p3-c2-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2(Cách 2 thay Ctrl+A). Nháy chọn Thẻ ... cần bôi đen toàn bộ tài liệu', img:'images/test1-p3-c1-th-buoc2.png', imgResult:'images/test1-p3-c1-da-buoc2.png', width:'100%', hotspot:{x:53,y:6,w:60,h:25} }, 
+{ text:'Bước 3(Cách 2 thay Ctrl+A). Nháy chọn nhóm lệnh ▼ và lệnh bôi đen tất cả', img:'images/test1-p3-c1-th-buoc3.png', imgResult:'images/test1-p3-c1-da-buoc4.png', width:'100%', hotspot:{x:527,y:73,w:65,h:29 },
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Select.png',
+	stage1Label: 'nhóm Editing',
+	stage2Label: 'lệnh',
+	menuWidth: '320px',
+       	hotspots: [
+           { x: 0, y: -1, w: 150, h: 25, label: '' },
+           { x: 0, y: 25, w: 150, h: 25, label: '' },
+           { x: 0, y: 51, w: 150, h: 25, label: '' }
+       		],
+       correctIndex: 0   }},
+{ text:'Bước 4. Nháy chọn mở rộng hộp thoại Paragraph ▼', img:'images/test1-p3-c2-th-buoc6.png', imgResult:'images/test1-p3-c2-da-buoc6.png', width:'100%', hotspot:{x:550,y:91,w:21,h:23} },
+{ text:'Bước 5. Thiết lập căn chỉnh theo yêu cầu - chọn xác nhận', imgResult:'images/test1-p3-c2-th-buockq.png', imgFinal:'images/test1-p3-c2-th-buockq.png', width:'100%', hotspot:{x:275,y:396,w:97,h:25},
+popupType:   'paragraph-spacing',  
+popupAnswer: {
+ 		alignLeft:false,      alignCenter:false, alignRight:false, alignJustify:true,
+ 		outlineBodyText:true, outlineLevel1:false, outlineLevel2:false,
+ 		left:0,  right:0,
+ 		specialNone:false, specialFirstLine:false, specialHanging:false, by:1,
+ 		before:0, after:0,
+ 		lsSingle:false, ls15lines:false, lsDouble:false,
+ 		lsAtLeast:false, lsExactly:false, lsMultiple:false, at:1} },
+{ text:'Ghi chú nhanh: phần bôi đen tài liệu -thuộc nhóm Editing thẻ Home-', imgResult:'images/test1-p3-c2-th-buockq.png', imgFinal:'images/test1-p3-c2-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'mở rộng Select',
+	ribbonSub: 'Select All' }},
+{ text:'Ghi chú nhanh: phần căn chỉnh lề -thuộc nhóm Paragraph thẻ Home-', imgResult:'images/test1-p3-c2-th-buockq.png', imgFinal:'images/test1-p3-c2-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'mở rộng hộp thoại Paragraph',
+	ribbonSub:'tab: Indents and Spacing',
+	ribbonSubSub: 'mục Alignment', 
+	ribbonSubSubSub: 'vị trí: Justified' }}
+ 	] 
+},
+
+{ title:' Câu 3. <u>Split</u> the paragraph between the <b>Registration</b> and <b>Educational Sessions</b> heading into <u>two columns</u> with <u>line between</u>. <br>Ensure the <u>second column</u> will start with the text <b>Registration</b>.',
+titleVi:'Câu 3. <u>Chia đoạn văn bản</u> nằm giữa tiêu đề <b>Registration</b> và tiêu đề <b>Educational Sessions</b> thành <u>Two columns</u> với <u>Line between</u>. Đảm bảo <u>cột thứ hai</u> bắt đầu bằng văn bản <b>Registration</b>.', 
+correctStep1:1, step1Group: 'A', imgResult1:'images/test1-p3-c3-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chọn đoạn văn bản cần chia cột', img:'images/test1-p7-c1-th-buoc2.png', imgResult:'images/test1-p7-c1-da-buoc1.png', width:'100%', hotspot:{x:113,y:2,w:55,h:30},
+popupType: 'text-selection',
+popupAnswer: {
+    	lineAboveText: 'Registration', 
+    	lineBelowText: 'Educational Sessions', 
+    	textParagraph: 'Our conference is four days in length - beginning Wednesday morning and ending at noon on Saturday.  Registration cost for the full conference is $100 for members and $180 for non-members.  To register, simply go to our website at www.googleapply.com',
+	hideParagraph2: true,
+    	targetParagraph: 'main-text', 
+    	isTripleClick: true,
+    	isDoubleClick: false,
+    	isDrag: false,
+	fontSize: { dong1: '18pt', dong2: '18pt', doan1: '14pt', doan2: '14pt' }
+	}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần chia cột', img:'images/test1-p3-c3-th-buoc2.png', imgResult:'images/test1-p3-c3-da-buoc2.png', width:'100%', hotspot:{x:242,y:2.5,w:51,h:26} }, 
+{ text:'Bước 3. Nháy chọn nhóm lệnh ▼ và lệnh mở rộng chia cột', img:'images/test1-p3-c3-th-buoc3.png', imgResult:'images/test1-p3-c3-da-buoc4.png', width:'100%', hotspot:{x:154,y:23,w:59,h:74 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Columns.png',
+	stage1Label: 'nhóm Page Setup',
+	stage2Label: 'lệnh',
+	menuWidth: '260px',
+       	hotspots: [
+           { x: 0, y: 38, w: 110, h: 23, label: '' },
+           { x: 0, y: 72, w: 110, h: 25, label: '' },
+           { x: 0, y: 170, w: 110, h: 22, label: '' }
+       		],
+       correctIndex: 2   }},
+{ text:'Bước 4. Thiết lập chia cột theo yêu cầu - chọn xác nhận', imgResult:'images/test1-p3-c3-da-buoc5.png', imgFinal:'images/test1-p3-c3-th-buockq.png', width:'100%', hotspot:{x:626,y:217,w:80,h:22}, 
+popupType:   'columns-popup',   
+popupAnswer: {
+ 	numCols1:false,   numCols2: true,  numCols3: false,  lineBetween: true,
+ 	col1width: 0, col1spacing: 0,          col2width: 0, col2spacing: 0,  
+ 	applyWhole:   true,          applyForward: false     } },
+{ text:'Bước 5. Nháy chuột chọn đúng vị trí ... cần ngắt cột', img:'images/test1-p3-c3-th-buoc6.png', imgResult:'images/test1-p3-c3-da-buoc6.png', width:'100%', hotspot:{x:120,y:240,w:20,h:35} }, 
+{ text:'Bước 6. Nháy chọn nhóm lệnh ▼ và lệnh ngắt cột', img:'images/test1-p3-c3-th-buoc8.png', imgResult:'images/test1-p3-c3-th-buockq.png', width:'100%', hotspot:{x:209,y:24,w:80,h:30 },
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Break.png',
+	stage1Label: 'nhóm Page setup',
+	stage2Label: 'lệnh',
+	menuWidth: '',
+       	hotspots: [
+           { x: 0, y: 19, w: 173, h: 45, label: '' },
+           { x: 1, y: 69, w: 173, h: 45, label: '' },
+           { x: 0, y: 121, w: 173, h: 45, label: '' }
+       		],
+       correctIndex: 1   }},
+{ text:'Ghi chú nhanh: phần chia cột -thuộc nhóm Page Setup thẻ Layout-', imgResult:'images/test1-p3-c3-th-buockq.png', imgFinal:'images/test1-p3-c3-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Layout',
+	ribbonCmd: 'mở rộng Columns',
+	ribbonSub: 'More columns', 
+	ribbonSubSub: 'mục Number: chọn số cột' ,
+	ribbonSubSubSub: 'chọn Line between' }},
+{ text:'Ghi chú nhanh: phần ngắt cột -thuộc nhóm Page Setup thẻ Layout-', imgResult:'images/test1-p3-c3-th-buockq.png', imgFinal:'images/test1-p3-c3-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Layout',
+	ribbonCmd: 'mở rộng Breaks',
+	ribbonSub: 'mục: Page Breaks',
+	ribbonSubSub: 'kiểu ngắt: Column'}}
+ 	] 
+},
+
+{ title:' Câu 4. <b>Insert</b> a <u>bookmark</u> to the beginning of the first paragraph <u>below</u> the <b>Expected Travel Costs</b> heading. <u>Name</u> it <b>Details</b>.',
+titleVi:'Câu 4. <b>Chèn</b> <u>Bookmark</u> vào đầu đoạn văn đầu tiên bên dưới tiêu đề <b>Expected Travel Costs</b>. Đặt <u>tên</u> là <b>Details.</b>', 
+correctStep1:7, step1Group: 'A', imgResult1:'images/test1-p3-c4-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chuột chọn đúng vị trí trước đoạn cần tạo bookmark', img:'images/test1-p3-c4-th-buoc1.png', imgResult:'images/test1-p3-c4-da-buoc1.png', width:'100%', hotspot:{x:41,y:212,w:23,h:31 }},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần chèn dấu trang', img:'images/test1-p3-c4-th-buoc2.png', imgResult:'images/test1-p3-c4-da-buoc2.png', width:'100%', hotspot:{x:117,y:2.2,w:70,h:30} }, 
+{ text:'Bước 3. Nháy chọn lệnh chèn dấu trang', img:'images/test1-p3-c4-th-buoc3.png', imgResult:'images/test1-p3-c4-da-buoc3.png', width:'100%', hotspot:{x:0,y:50,w:89,h:27} }, 
+{ text:'Bước 4. Nhập tên bookmark - xác nhận thêm (bài thi sẽ đóng bookmark sau khi thêm tên).', imgResult:'images/test1-p3-c4-th-buockq.png', imgFinal:'images/test1-p3-c4-th-buockq.png', width:'100%', hotspot:{x:275,y:396,w:97,h:25},
+popupType:   'bookmark',
+popupAnswer: {
+	bookmarkName: 'Details',  
+	sortByName:   true,            
+	sortByLocation: false,         
+	showHidden:   false,           
+	action:       'add', 
+	existingBookmarks: ['Bookmark1', 'Bookmark2'] }},
+{ text:'Ghi chú nhanh: các thao tác chèn dấu trang -thuộc nhóm Links thẻ Insert-', imgResult:'images/test1-p3-c4-th-buockq.png', imgFinal:'images/test1-p3-c4-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Insert',
+	ribbonCmd: 'Bookmark',
+	ribbonSub: 'ô Name: nhập tên cần thêm',
+	ribbonSubSub: 'xác nhận: Add' }}
+ ] 
+},
+
+{ title:' Câu 5. <b>Create</b> a <u>custom watermark</u> with content text <b>edudic.io</b> in <u>font</u> <b>Arial</b> and <b>Dark Blue</b> <u>color</u>. Accept all other default settings.',
+titleVi:'Câu 5. <b>Tạo</b> <u>Custom Watermark</u> với nội dung <b>edudic.io</b>, sử dụng <u>phông chữ</u> <b>Arial</b> và <u>màu</u> <b>Dark Blue</b>. Giữ nguyên các thiết lập mặc định khác.', 
+correctStep1:2, step1Group: 'A', imgResult1:'images/test1-p1-c1-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2. Nháy chọn Thẻ ... cần chèn hình mờ', img:'images/test1-p3-c5-th-buoc2.png', imgResult:'images/test1-p3-c5-da-buoc2.png', width:'100%', hotspot:{x:184,y:2,w:64,h:27.5} }, 
+{ text:'Bước 3. Nháy chọn nhóm lệnh ▼ và lệnh tùy chỉnh hình mờ', img:'images/test1-p3-c5-th-buoc3.png', imgResult:'images/test1-p3-c5-da-buoc4.png', width:'100%', hotspot:{x:254,y:31,w:75,h:79 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Watermark.png',
+	stage1Label: 'nhóm Page Background',
+	stage2Label: 'lệnh',
+	menuWidth: '',
+       	hotspots: [
+           { x: 8, y: 16, w: 73, h: 102, label: '' },
+           { x: 8, y: 136, w: 73, h: 102, label: '' },
+           { x: 0, y: 266, w: 134, h: 20, label: '' }
+       		],
+       correctIndex: 2   }},
+{ text:'Bước 4. Thiết lập tạo Watermark theo yêu cầu - chọn xác nhận', imgResult:'images/test1-p3-c5-th-buockq.png', imgFinal:'images/test1-p3-c5-th-buockq.png', width:'100%', hotspot:{x:536,y:367,w:150,h:35},
+popupType: 'watermark',
+popupAnswer: {
+	textWatermark:  true,
+	text:           'edudic.io',
+	fontArial:      true,
+	fontDefault:    'Times New Roman', 
+	colorDarkBlue:  true,
+	colorDefault:   'Automatic',       
+	semitransparent:true,
+	layoutHorizontal:false }} ,
+{ text:'Ghi chú nhanh: các thao tác tạo hình mờ -thuộc nhóm Page Background thẻ Design-', imgResult:'images/test1-p3-c5-th-buockq.png', imgFinal:'images/test1-p3-c5-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Design',
+	ribbonCmd: 'mở rộng Watermark',
+	ribbonSub: 'kiểu: Custum Watermark', 
+	ribbonSubSub: 'mục Text watermark: bật check',
+	ribbonSubSubSub: 'thiết lập theo yêu cầu'}}
+   ] 
+},
+
+{ title:' Câu 6. At the end of the document, <u>insert</u> the contents of <b>Company info.docx</b> in <b>Misc</b> <u>Folder</u>.',
+titleVi:'Câu 6. Ở cuối tài liệu, <u>chèn</u> nội dung của tệp <b>Company info.docx</b> trong <u>thư mục</u> <b>Misc</b>.', 
+correctStep1:7, step1Group: 'A', imgResult1:'images/test1-p3-c6-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chuột chọn đúng vị trí cuối tài liệu', img:'images/test1-p3-c6-th-buoc1.png', imgResult:'images/test1-p3-c6-da-buoc1.png', width:'100%', hotspot:{x:46,y:384,w:525,h:31}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần chèn tài liệu', img:'images/test1-p3-c6-th-buoc2.png', imgResult:'images/test1-p3-c6-da-buoc2.png', width:'100%', hotspot:{x:114,y:1.2,w:58,h:24} }, 
+{ text:'Bước 3. Nháy chọn nhóm lệnh ▼ và lệnh chèn tài liệu', img:'images/test1-p3-c6-th-buoc3.png', imgResult:'images/test1-p3-c6-da-buoc4.png', width:'100%', hotspot:{x:426,y:73,w:81,h:30 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Object.png',
+	stage1Label: 'nhóm Text',
+	stage2Label: 'lệnh',
+	menuWidth: '240px',
+       	hotspots: [
+           { x: 0, y: 1, w: 116, h: 20, label: '' },
+           { x: 0, y: 24, w: 116, h: 22, label: '' }
+       		],
+       correctIndex: 1   }},
+{ text:'Bước 4. Nháy chọn file tài liệu cần chèn - xác nhận chèn', img:'images/test1-p3-c6-th-buoc5.png', imgResult:'images/test1-p3-c6-th-buockq.png', imgFinal:'images/test1-p3-c6-th-buockq.png', width:'100%', hotspot:{x:496,y:420,w:55,h:20 },
+popupType: 'file-open',
+popupAnswer: {
+    btnLabel: 'Insert', 
+    correctFile: 'Company info.docx',
+    correctFolder: 'Misc'}},
+{ text:'Ghi chú nhanh: các thao tác chèn tài liệu -thuộc nhóm Text thẻ Insert-', imgResult:'images/test1-p3-c6-th-buockq.png', imgFinal:'images/test1-p3-c6-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Insert',
+	ribbonCmd: 'mở rộng Object',
+	ribbonSub: 'kiểu chèn: Text from File', 
+	ribbonSubSub: 'Lưu trữ: theo yêu cầu',
+	ribbonSubSubSub: 'xác nhận chèn'}}
+ 	] 
+},
+],
+
+/* ===== PROJECT 4 ===== */
+[
+{ title:' Câu 1. On page 1, <u>below</u> the <b>Table of contents</b> heading, <b>insert</b> <u>Table of contents</u> <b>type</b> <u>Automatic Table 1</u>.',
+titleVi:'Câu 1. Trên trang 1, bên dưới tiêu đề <b>Table of contents</b>, <u>chèn mục lục</u> <b>Automatic Table 1</b>.', 
+correctStep1:7, step1Group: 'A', imgResult1:'images/test1-p4-c1-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chuột chọn đúng vị trí cần tạo mục lục', img:'images/test1-p4-c1-th-buoc1.png', imgResult:'images/test1-p4-c1-da-buoc1.png', width:'100%', hotspot:{x:3,y:221,w:574,h:34}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần chèn mục lục', img:'images/test1-p4-c1-th-buoc2.png', imgResult:'images/test1-p4-c1-da-buoc2.png', width:'100%', hotspot:{x:300,y:1,w:80,h:30} }, 
+{ text:'Bước 3. Nháy chọn nhóm lệnh ▼ và kiểu mục lục cần chèn', img:'images/test1-p4-c1-th-buoc3.png', imgResult:'images/test1-p4-c1-da-buoc4.png', width:'100%', hotspot:{x:3,y:30,w:71,h:84 },
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Mucluc.png',
+	stage1Label: 'nhóm Table of Contents',
+	stage2Label: 'lệnh',
+	menuWidth: '320px',
+       	hotspots: [
+           { x: 1, y: 13, w: 270, h: 81, label: '' },
+           { x: 1, y: 103, w: 270, h: 80, label: '' },
+           { x: 0, y: 193, w: 270, h: 76, label: '' },
+           { x: 0, y: 300, w: 129, h: 19, label: '' }
+       		],
+       correctIndex: 0   }},
+{ text:'Ghi chú nhanh: các thao tác chèn mục lục -thuộc nhóm Table of Contents thẻ References-', imgResult:'images/test1-p4-c1-th-buockq.png', imgFinal:'images/test1-p4-c1-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_References',
+	ribbonCmd: 'mởR Table of Contents',
+	ribbonSub: 'kiểu: Automatic Table 1' }}
+  	] 
+},
+
+{ title:' Câu 2. <b>Edit year</b> of <u>citation</u> in the document from <b>2021 to 2016</b>.',
+titleVi:'Câu 2. <b>Chỉnh sửa năm</b> của <u>Citation</u> trong tài liệu từ <b>2021 thành 2016</b>.', 
+correctStep1:2, step1Group: 'A', imgResult1:'images/test1-p1-c1-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2. Nháy chọn Thẻ ... cần chỉnh sửa trích dẫn', img:'images/test1-p4-c2-th-buoc2.png', imgResult:'images/test1-p4-c2-da-buoc2.png', width:'100%', hotspot:{x:336,y:3,w:90,h:30} }, 
+{ text:'Bước 3. Nháy chọn lệnh quản lý nguồn', img:'images/test1-p4-c2-th-buoc3.png', imgResult:'images/test1-p4-c2-da-buoc3.png', width:'100%', hotspot:{x:444,y:29,w:140,h:30} },
+{ text:'Bước 4. Nháy chọn nguồn chỉnh sửa và nút chỉnh sửa (chọn 2 vị trí)', img:'images/test1-p4-c2-th-buoc4.png', imgResult:'images/test1-p4-c2-da-buoc4.png', width:'100%', hotspot:{x:0,y:118,w:78,h:22 },
+popupType: 'multi-hotspot',
+popupAnswer: {
+  	hotspots: [
+    	{ x:84, y:53, w:300, h:25, label:'' },
+    	{ x:1, y:116, w:75, h:25, label:'' }
+  	]
+	}},
+{ text:'Bước 5. Thiết lập chỉnh sửa theo yêu cầu – chọn xác nhận', imgResult:'images/test1-p4-c2-th-buockq.png', imgFinal:'images/test1-p4-c2-th-buockq.png', width:'100%', hotspot:{x:626,y:217,w:80,h:22},
+popupType: 'manage-sources',
+popupAnswer: {
+	typeBook:    true,
+	year:        '2016' } },
+{ text:'Ghi chú nhanh: các thao tác chỉnh sửa tài liệu tham khảo -thuộc nhóm Citations & Bibliography thẻ References-', imgResult:'images/test1-p4-c2-th-buockq.png', imgFinal:'images/test1-p4-c2-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_References',
+	ribbonCmd: 'Manage Sources',
+	ribbonSub: 'tên nguồn: theo yêu cầu',
+	ribbonSubSub: 'Thao tác chỉnh sửa: Edit' ,
+	ribbonSubSubSub: 'thông tin chỉnh sửa: theo yêu cầu' }}
+] 
+},
+
+{ title:' Câu 3. Using <u>Go to</u> features to navigate to <b>3rd heading</b>. <u>Clear all formatting</u> of the <b>first paragraph</b> below it.',
+titleVi:'Câu 3. Sử dụng tính năng <u>Go To</u> để chuyển đến <b>3rd heading</b>. Sử dụng <u>Clear all formatting</u> cho <b>đoạn văn đầu tiên</b> bên dưới tiêu đề đó.', 
+correctStep1:4, step1Group: 'A', imgResult1:'images/test1-p4-c3-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2(Cách 2 thay Ctrl+G). Nháy chọn Thẻ ... điều hướng đến tiêu đề', img:'images/test1-p4-c3-th-buoc2.png', imgResult:'images/test1-p4-c3-da-buoc2.png', width:'100%', hotspot:{x:53,y:1.7,w:70,h:32} }, 
+{ text:'Bước 3(Cách 2 thay Ctrl+G). Nháy chọn nhóm lệnh ▼ và lệnh điều hướng', img:'images/test1-p4-c3-th-buoc3.png', imgResult:'images/test1-p4-c3-da-buoc4.png', width:'100%', hotspot:{x:561,y:35,w:65,h:26 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Find.png',
+	stage1Label: 'nhóm Editing',
+	stage2Label: 'lệnh',
+	menuWidth: '240px',
+       	hotspots: [
+           { x: 0, y: 0, w: 122, h: 23, label: '' },
+           { x: 1, y: 25, w: 122, h: 21, label: '' },
+           { x: 1, y: 48, w: 122, h: 24, label: '' }
+       		],
+       correctIndex: 2   }},
+{ text:'Bước 4. Thiết lập điều hướng theo yêu cầu (mặc định) - chọn xác nhận', imgResult:'images/test1-p4-c3-da-buoc6.png', imgFinal:'images/test1-p4-c3-th-buockq.png', width:'100%', hotspot:{x:686,y:23,w:42,h:70},
+popupType: 'goto',
+popupAnswer: {
+	gotoHeading:     true,
+	enterValue:   '3',      
+	enterDefault: '1',      
+	btnNext:      true } }, 
+{ text:'Bước 5. Nháy chọn đoạn đầu tiên của tiêu đề 3', imgResult:'images/test1-p4-c3-da-buoc6.png', imgFinal:'images/test1-p4-c3-th-buockq.png', width:'100%', hotspot:{x:22,y:261,w:700,h:50},
+popupType: 'text-selection',
+popupAnswer: {
+        lineAboveText: 'B.     Schedule',
+        lineBelowText: '',
+       	textParagraph: 'Below are the days and times each course is taught.  Level 1 courses are designed for beginners.  Level 2 – 4 courses assume prerequisite skills.  Please contact our main office if you have questions prior to registration.',
+        textParagraph2: 'A plan of things to be done and the time when they will be done.',
+        targetParagraph: 'main-text',
+        isTripleClick: true,
+        isDoubleClick: false,
+	fontSize: { dong1: '18pt', dong2: '14pt', doan1: '14pt', doan2: '14pt' },
+        isDrag: false }},
+{ text:'Bước 6. Nháy chọn icon/lệnh xóa mọi định dạng', img:'images/test1-p4-c3-th-buoc8.png', imgResult:'images/test1-p4-c3-th-buockq.png', imgFinal:'images/test1-p4-c3-th-buockq.png', width:'100%', hotspot:{x:377,y:33,w:34,h:34} },
+{ text:'Ghi chú nhanh: phần điều hướng đến tiêu đề -thuộc nhóm Editing thẻ Home-', imgResult:'images/test1-p4-c3-th-buockq.png', imgFinal:'images/test1-p4-c3-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'mở rộng Find',
+	ribbonSub: 'Goto', 
+	ribbonSubSub: 'danh sách: Heading',
+	ribbonSubSubSub: 'ô Number: số tiêu đề'}},
+{ text:'Ghi chú nhanh: phần xóa tất cả định dạng văn bản -thuộc nhóm Font thẻ Home-', imgResult:'images/test1-p4-c3-th-buockq.png', imgFinal:'images/test1-p4-c3-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'icon Clear All Formatting'}}
+ 	] 
+},
+
+{ title:' Câu 4. <b>Remove the functionable of the table</b> <u>below</u> the <b>Notes</b> heading on the last page. Do <b>not remove content</b> of it. Accept all other default settings.',
+titleVi:'Câu 4. <b>Xóa chức năng của bảng</b> <u>bên dưới</u> tiêu đề <b>Notes</b> ở trang cuối thành văn bản. Không xóa nội dung của bảng. Giữ nguyên các thiết lập mặc định khác.', 
+correctStep1:6, step1Group: 'A', imgResult1:'images/test1-p4-c4-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chọn bảng cần loại bỏ chức năng', img:'images/test1-p4-c4-th-buoc2.png', imgResult:'images/test1-p4-c4-da-buoc1.png', width:'100%', hotspot:{x:572,y:28,w:65,h:25},
+popupType: 'table-row-selection',
+popupAnswer: {
+	tableTitle: 'Here are three basic things you can do to keep your computer running well.',
+    	targetTable: true, 
+    	tableData: [       
+     		['Get antivirus software to secure your conputer from the inside.'],
+     		['Perform regular software uadate to help it run smoothly'],
+     		['Do your computer maintenance regularly'],  ]
+	}},
+
+{ text:'Bước 2. Nháy chọn thẻ Tools ... cần loại bỏ chức năng bảng', img:'images/test1-p4-c4-th-buoc2.png', imgResult:'images/test1-p4-c4-da-buoc2.png', width:'100%', hotspot:{x:574,y:27,w:60,h:25} }, 
+{ text:'Bước 3. Nháy chọn lệnh chuyển sang văn bản', img:'images/test1-p4-c4-th-buoc3.png', imgResult:'images/test1-p4-c4-da-buoc3.png', width:'100%', hotspot:{x:498,y:74,w:118,h:28} }, 
+{ text:'Bước 4. Thiết lập theo yêu cầu - chọn xác nhận (mặc định)', img:'images/test1-p4-c4-th-buoc4.png', imgResult:'images/test1-p4-c4-th-buockq.png', imgFinal:'images/test1-p4-c4-th-buockq.png', width:'100%', hotspot:{x:464,y:329,w:74,h:22 }},
+{ text:'Ghi chú nhanh: các thao tác bỏ chức năng bảng -thuộc nhóm Data thẻ Tools Table_Layout-', imgResult:'images/test1-p4-c4-th-buockq.png', imgFinal:'images/test1-p4-c4-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'Tools Table_Layout',
+	ribbonCmd: 'Convert to Text',
+	ribbonSub: 'Thiết lập theo yêu cầu'}}
+  	] 
+},
+
+{ title:' Câu 5. <b>Locate the sentence</b> starting with text <b>Microsoft Office 2016</b>, and <b>insert</b> a <u>Copyright Sign</u> at the end of <b>Microsoft Excel</b>.',
+titleVi:'Câu 5. <b>Tìm câu</b> bắt đầu bằng <b>Microsoft Office 2016</b>, rồi <b>chèn</b> <u>Copyright Sign</u> vào cuối cụm từ <b>Microsoft Excel</b>.', 
+correctStep1:4, step1Group: 'A', imgResult1:'images/test1-p4-c5-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2(Cách 2 thay Ctrl+F). Nháy chọn Thẻ ... cần tìm kiếm văn bản', img:'images/test1-p4-c5-th-buoc2.png', imgResult:'images/test1-p4-c5-da-buoc2.png', width:'100%', hotspot:{x:57,y:3,w:59,h:30} }, 
+{ text:'Bước 3(Cách 2 thay Ctrl+F). Nháy chọn nhóm lệnh ▼ và lệnh tìm kiếm văn bản', img:'images/test1-p4-c5-th-buoc3.png', imgResult:'images/test1-p4-c5-da-buoc4.png', width:'100%', hotspot:{x:562,y:34,w:69,h:27 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Find.png',
+	stage1Label: 'nhóm Editing',
+	stage2Label: 'lệnh',
+	menuWidth: '240px',
+       	hotspots: [
+           { x: 0, y: 1, w: 122, h: 23, label: '' },
+           { x: 0, y: 25, w: 122, h: 21, label: '' },
+           { x: 0, y: 48, w: 122, h: 23, label: '' }
+       		],
+       correctIndex: 0   }},
+{ text:'Bước 5. Nhập văn bản cần tìm kiếm - chọn kết quả', imgResult:'images/test1-p4-c5-da-buoc5.png', imgFinal:'images/test1-p4-c5-th-buockq.png', width:'100%', hotspot:{x:360,y:163,w:200,h:25},
+popupType: 'find-nav',  
+popupAnswer: {
+    searchText: "Microsoft Office 2016",
+    docText: "Microsoft Office 2016 is a suite of productivity applications that includes Microsoft Access, Microsoft Word, Microsoft OneNote, Microsoft Outlook, Microsoft PowerPoint, and Microsoft Excel."
+	}},
+{ text:'Bước 6. Trên đoạn vừa tìm, nháy chuột chọn đúng vị trí chèn kí hiệu (sau từ Excel)', img:'images/test1-p4-c5-th-buoc6.png', imgResult:'images/test1-p4-c5-da-buoc6.png', width:'100%', hotspot:{x:197,y:266,w:23,h:23}},
+{ text:'Bước 7. Tiếp tục chọn Thẻ … cần chèn kí hiệu.', img:'images/test1-p4-c5-th-buoc7.png', imgResult:'images/test1-p4-c5-da-buoc7.png', width:'100%', hotspot:{x:111,y:1,w:64,h:27}},
+{ text:'Bước 8. Nháy chọn nhóm lệnh ▼ và lệnh mở rộng kí hiệu', img:'images/test1-p4-c5-th-buoc8.png', imgResult:'images/test1-p4-c5-da-buoc9.png', width:'100%', hotspot:{x:487,y:45,w:80,h:25},
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Symbol.png',
+	stage1Label: 'nhóm Symbols',
+	stage2Label: 'lệnh',
+	menuWidth: '280px',
+       	hotspots: [
+           { x: 0, y: 123, w: 122, h: 21, label: '' }
+       		],
+       correctIndex: 0   }},
+{ text:'Bước 9. Nháy chọn icon/tên cần chèn – chọn xác nhận', imgResult:'images/test1-p4-c5-th-buockq.png', imgFinal:'images/test1-p4-c5-th-buockq.png', width:'100%', hotspot:{x:426,y:393,w:85,h:27},
+popupType: 'symbol-special',
+popupAnswer: {
+    	symbolName: 'Copyright'   }},
+{ text:'Ghi chú nhanh: phần tìm kiếm văn bản -thuộc nhóm Editing thẻ Home-', imgResult:'images/test1-p4-c5-th-buockq.png', imgFinal:'images/test1-p4-c5-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'mở rộng Find',
+	ribbonSub: 'Find', 
+	ribbonSubSub: 'ô tìm kiếm: nhập văn bản',
+	ribbonSubSubSub: 'mục Results: chọn văn bản tìm được' }},
+{ text:'Ghi chú nhanh: phần chèn ký hiệu -thuộc nhóm Symbols thẻ Insert-', imgResult:'images/test1-p4-c5-th-buockq.png', imgFinal:'images/test1-p4-c5-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Insert',
+	ribbonCmd: 'mở rộng Symbol',
+	ribbonSub: 'More Symbols', 
+	ribbonSubSub: 'tab: Special Characters',
+	ribbonSubSubSub: 'ký hiệu: theo yêu cầu' }}
+ 	] 
+},
+
+{ title:' Câu 6. Format the title, <b>Table of contents</b> as a <u>WordArt</u> textbox. Use the <u>style</u> <b>Fill – Gold, Accent 4, Soft Bevel</b>.',
+titleVi:'Câu 6. Định dạng tiêu đề <b>Table of contents</b> thành <u>WordArt</u>. Sử dụng <u>kiểu</u> <b>Fill – Gold, Accent 4, Soft Bevel</b>.', 
+correctStep1:1, step1Group: 'A', imgResult1:'images/test1-p4-c6-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chọn văn bản cần định dạng chữ nghệ thuật', img:'images/test1-p4-c6-th-buoc2.png', imgResult:'images/test1-p4-c6-da-buoc1.png', width:'100%', hotspot:{x:117,y:2.2,w:70,h:30 },
+popupType: 'text-selection',
+popupAnswer: {
+    	lineAboveText: '', 
+    	lineBelowText: 'Computer Courses', 
+    	textParagraph: 'Table of contents',
+    	textParagraph2: 'Microsoft Office 2016 is a suite of productivity applications that includes Microsoft Access, Microsoft Word, Microsoft OneNote, Microsoft Outlook, Microsoft PowerPoint, and Microsoft Excel.',
+    	targetParagraph: 'main-text', 
+    	isTripleClick: true,
+    	isDoubleClick: false,
+    	isDrag: false,
+	fontSize: { dong1: '18pt', dong2: '18pt', doan1: '24pt', doan2: '14pt' }
+	}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần tạo chữ nghệ thuật', img:'images/test1-p4-c6-th-buoc2.png', imgResult:'images/test1-p4-c6-da-buoc2.png', width:'100%', hotspot:{x:127,y:5,w:60,h:30} }, 
+{ text:'Bước 3. Nháy chọn nhóm lệnh ▼ và kiểu chữ nghệ thuật', img:'images/test1-p4-c6-th-buoc3.png', imgResult:'images/test1-p4-c6-da-buoc4.png', width:'100%', hotspot:{x:331,y:51,w:86,h:28 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Wordart.png',
+	stage1Label: 'nhóm Text',
+	stage2Label: 'lệnh',
+	menuWidth: '',
+       	hotspots: [
+           { x: 224, y: 0, w: 50, h: 49, label: 'Fill – Gold, Accent 4, Soft Bevel' },
+           { x: 109, y: 57, w: 53, h: 49, label: 'Gradient Fill, Gold,...' },
+           { x: 53, y: 114, w: 53, h: 49, label: 'Fill - Black, Text 1, Outline,...' }
+       		],
+       correctIndex: 0   }},
+{ text:'Ghi chú nhanh: các thao tác chèn chữ nghệ thuật -thuộc nhóm Text thẻ Insert-', imgResult:'images/test1-p4-c6-th-buockq.png', imgFinal:'images/test1-p4-c6-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Insert',
+	ribbonCmd: 'mở rộng WordArt',
+	ribbonSub: 'tên WordArt: Fill Gold',
+	ribbonSubSub: 'kiểu WordArt: theo yêu cầu' }}
+] 
+},
+
+{ title:' Câu 7. <b>Create</b> a <u>large capital</u> letter at the beginning of the first paragraph <u>below</u> the <b>Instructors</b> heading with <b>In margin</b> <u>style</u> and <b>4 lines</b> to <u>drop</u>.',
+titleVi:'Câu 7. <b>Tạo</b> <u>Drop Cap</u> ở đầu đoạn văn đầu tiên <u>bên dưới</u> tiêu đề <b>Instructor</b>, sử dụng <u>kiểu</u> <b>In margin</b> và <u>lines to drop</u> <b>4</b>.', 
+correctStep1:7, step1Group: 'A', imgResult1:'images/test1-p4-c7-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chuột chọn đúng vị trí đầu đoạn văn bản cần tạo chữ lớn', img:'images/test1-p4-c7-th-buoc1.png', imgResult:'images/test1-p4-c7-da-buoc1.png', width:'100%', hotspot:{x:0,y:341,w:15,h:28}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần tạo chữ lớn đầu câu', img:'images/test1-p4-c7-th-buoc2.png', imgResult:'images/test1-p4-c7-da-buoc2.png', width:'100%', hotspot:{x:110,y:1,w:60,h:28} }, 
+{ text:'Bước 3. Nháy chọn nhóm lệnh ▼ và lệnh tùy chọn chữ lớn', img:'images/test1-p4-c7-th-buoc3.png', imgResult:'images/test1-p4-c7-da-buoc4.png', width:'100%', hotspot:{x:332,y:73,w:94,h:28 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Dropcap.png',
+	stage1Label: 'nhóm Text',
+	stage2Label: 'lệnh',
+	menuWidth: '28',
+       	hotspots: [
+           { x: 0, y: 51, w: 135, h: 32, label: '' },
+           { x: 0, y: 94, w: 135, h: 32, label: '' },
+           { x: 0, y: 132, w: 136, h: 28, label: '' }
+       		],
+       correctIndex: 2   }},
+{ text:'Bước 5. Thiết lập tạo chữ lớn theo yêu cầu - chọn xác nhận', imgResult:'images/test1-p4-c7-th-buockq.png', imgFinal:'images/test1-p4-c7-th-buockq.png', width:'100%', hotspot:{x:7,y:13,w:200,h:50},
+popupType: 'drop-cap',
+popupAnswer: {
+	posDropped:        false,
+	posInMargin:true,   
+	fontTimesNewRoman: true,
+	linesDropped:      4,
+	distanceFromText:  0.00 } } ,
+{ text:'Ghi chú nhanh: các thao tác chèn chữ lớn đầu dòng -thuộc nhóm Text thẻ Insert-', imgResult:'images/test1-p4-c7-th-buockq.png', imgFinal:'images/test1-p4-c7-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Insert',
+	ribbonCmd: 'mở rộng Drop Cap',
+	ribbonSub: 'Drop Cap Options', 
+	ribbonSubSub: 'vị trí: In margin',
+	ribbonSubSubSub: 'số dòng: theo yêu cầu'}}
+   	] 
+},
+],
+
+/* ===== PROJECT 5 ===== */
+[
+{ title:' Câu 1. Use the <u>Find and Replace</u> feature to <u>replace all</u> instances of <b>rootball</b> with <b>Amazon</b>. Do not change the other settings.',
+titleVi:'Câu 1. Sử dụng tính năng <u>Find and Replace</u> để <u>thay thế tất cả</u> <b>rootball</b> bằng <b>Amazon</b>. Không thay đổi các thiết lập khác.', 
+correctStep1:4, step1Group: 'A', imgResult1:'images/test1-p1-c1-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2(cách 2 thay Ctrl+H). Nháy chọn Thẻ ... cần tìm kiếm và thay thế', img:'images/test1-p5-c1-th-buoc2.png', imgResult:'images/test1-p5-c1-da-buoc2.png', width:'100%', hotspot:{x:47,y:1.8,w:60,h:30} }, 
+{ text:'Bước 3(cách 2 thay Ctrl+H). Nháy chọn lệnh tìm kiếm và thay thế', img:'images/test1-p5-c1-th-buoc3.png', imgResult:'images/test1-p5-c1-da-buoc3.png', width:'100%', hotspot:{x:509,y:48,w:60,h:25} },
+{ text:'Bước 4. Thiết lập tìm kiếm và thay thế theo yêu cầu - chọn xác nhận', imgResult:'images/test1-p5-c1-th-buockq.png', imgFinal:'images/test1-p5-c1-th-buockq.png', width:'100%', hotspot:{x:275,y:396,w:97,h:25},
+popupType:   'find-replace',
+popupAnswer: {
+	findWhat:      'rootball',
+	replaceWith:   'Amazon',
+	btnReplaceAll: true,
+	fontArial:     true,
+	matchCase:  false }},
+{ text:'Ghi chú nhanh: các thao tác tìm kiếm và thay thế -thuộc nhóm Editing thẻ Home-', imgResult:'images/test1-p5-c1-th-buockq.png', imgFinal:'images/test1-p5-c1-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'Replace',
+	ribbonSub: 'ô Find what: văn bản tìm kiếm',
+	ribbonSubSub: 'ô Replace with: văn bản thay thế',
+	ribbonSubSubSub: 'kiểu: Replace All' }}
+  	] 
+},
+
+{ title:' Câu 2. Apply <u>Shaded</u> <b>Document</b> formatting to the document.',
+titleVi:'Câu 2. Áp dụng <b>Document Formatting</b> <u>Shaded</u> cho tài liệu.', 
+correctStep1:2, step1Group: 'A', imgResult1:'images/test1-p1-c1-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2. Nháy chọn Thẻ ... cần định dạng tài liệu', img:'images/test1-p5-c2-th-buoc2.png', imgResult:'images/test1-p5-c2-da-buoc2.png', width:'100%', hotspot:{x:172,y:1,w:57,h:30} }, 
+{ text:'Bước 3. Nháy chọn mở rộng kiểu ▼ và kiểu tài liệu (Mẹo dấu hiệu Haeding: màu = Shaded, số = number, ở giữa = Center, gạch chân = line)', img:'images/test1-p5-c2-th-buoc3.png', imgResult:'images/test1-p5-c2-th-buockq.png', width:'100%', hotspot:{x:551,y:68,w:25,h:30 },
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Styledocument.png',
+	stage1Label: 'mở rộng Style document',
+	stage2Label: 'lệnh',
+	menuWidth: '',
+       	hotspots: [
+           { x: 214, y: 136, w: 77, h: 57, label: 'Shaded' },
+           { x: 67, y: 23, w: 79, h: 59, label: 'Basic simple' },
+           { x: 214, y: 77, w: 77, h: 58, label: 'Centered' }
+       		],
+       correctIndex: 0   }},
+{ text:'Ghi chú nhanh: các thao tác định dạng tài liệu -thuộc nhóm Document Formatting thẻ Design-', imgResult:'images/test1-p5-c2-th-buockq.png', imgFinal:'images/test1-p5-c2-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Design',
+	ribbonCmd: 'mở rộng More Document Formatting',
+	ribbonSub: 'kiểu: Shaded'}}
+ 	] 
+},
+
+{ title:' Câu 3. In the first list, <u>replace</u> the current <b>bullet</b> character with the <u>image</u> <b>mosword2016.png</b> located in the <b>Misc</b> <u>folder</u>.',
+titleVi:'Câu 3. Trong danh sách đầu tiên, thay thế <u>bullet</u> hiện tại bằng hình ảnh <b>mosword2016.png</b> trong <u>thư mục</u> <b>Misc</b>.', 
+correctStep1:6, step1Group: 'A', imgResult1:'images/test1-p5-c3-th-buoc2.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chọn đoạn Bullet cần thay thế (quan sát đáp án bên phải)', img:'images/test1-p5-c3-th-buoc2.png', imgResult:'images/test1-p5-c3-da-buoc1.png', width:'100%', hotspot:{x:113,y:2,w:55,h:30},
+popupType: 'text-selection',
+popupAnswer: {
+	lineAboveText: 'General Appearance', 
+    	lineBelowText: 'Trunk',
+    textParagraph: '• The shape of  the tree...\n• The tree should have an...\n• The tree should have a single...',
+    isDoubleClick: true,
+    isTripleClick: false,
+    isDrag: false,
+    targetWord: '•',
+	textParagraph2: '1. The trunk should be free of insect damage such as bore holes.',
+	fontSize: { dong1: '18pt', dong2: '18pt', doan1: '14pt', doan2: '14pt' }
+	}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần thay thế hoa thị đầu dòng', img:'images/test1-p5-c3-th-buoc2.png', imgResult:'images/test1-p5-c3-da-buoc2.png', width:'100%', hotspot:{x:55,y:4,w:50,h:30} }, 
+{ text:'Bước 3. Nháy chọn nhóm lệnh ▼ và lệnh thay mới ký hiệu', img:'images/test1-p5-c3-th-buoc3.png', imgResult:'images/test1-p5-c3-da-buoc4.png', width:'100%', hotspot:{x:371,y:27,w:37,h:30 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Bullet.png',
+	stage1Label: 'nhóm Paragraph',
+	stage2Label: 'lệnh',
+	menuWidth: '',
+       	hotspots: [
+           { x: 1, y: 186, w: 150, h: 26, label: '' },
+           { x: 0, y: 213, w: 151, h: 26, label: '' }
+        		],
+       correctIndex: 1   }},
+{ text:'Bước 4. Nháy chọn mục chứa hình ảnh', img:'images/test1-p5-c3-th-buoc5.png', imgResult:'images/test1-p5-c3-da-buoc5.png', width:'100%', hotspot:{x:210,y:80,w:75,h:23} },
+{ text:'Bước 5. Tìm hình ảnh và xác nhận thay thế', img:'images/test1-p5-c3-th-buoc6.png', imgResult:'images/test1-p5-c3-th-buockq.png', imgFinal:'images/test1-p5-c3-th-buockq.png', width:'100%', hotspot:{x:450,y:403,w:55,h:20},
+popupType: 'file-open',
+popupAnswer: {
+    btnLabel: 'Open',
+    correctFile: 'mosword2016.png',
+    correctFolder: 'Misc'}},
+{ text:'Ghi chú nhanh: các thao tác thay đổi kí hiệu đầu dòng -thuộc nhóm Paragraph thẻ Home-', imgResult:'images/test1-p5-c3-th-buockq.png', imgFinal:'images/test1-p5-c3-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'mở rộng Bullets',
+	ribbonSub: 'Define New bullet', 
+	ribbonSubSub: 'mục Picture',
+	ribbonSubSubSub: 'tìm hình ảnh thay thế'}}
+ 	] 
+},
+
+{ title:' Câu 4. Change <u>style</u> of text <b>Contact information</b> on the last page to <u>Heading 1</u>. Then <u>update entire</u> <b>table of contents</u>.',
+titleVi:'Câu 4. Thay đổi <u>Style</u> của văn bản <b>Contact information</b> ở trang cuối thành <u>Heading 1</u>. Sau đó <u>Update Table</u> toàn bộ mục lục.', 
+correctStep1:1, step1Group: 'A', imgResult1:'images/test1-p5-c4-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chọn văn bản cần thay đổi kiểu văn bản', img:'images/test1-p5-c4-th-buoc2.png', imgResult:'images/test1-p5-c4-da-buoc1.png', width:'100%', hotspot:{x:50,y:1,w:65,h:25}, 
+popupType: 'text-selection',
+popupAnswer: {
+	lineAboveText: 'Crown', 
+    	lineBelowText: '',
+    textParagraph: '1.     Make sure the branches come off the leader trunk at between 45-degree and 90-degree angle. Any wounds from pruned branches should be healed or almost healed.\n2.     Branches should have good scaffolding, which means they are evenly distributed throughout the tree.',
+    textParagraph2: 'Contact information',
+    targetParagraph: 'main-text-2',
+    isTripleClick: true,
+	fontSize: { dong1: '18pt', dong2: '18pt', doan1: '14pt', doan2: '18pt' }
+	}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần thay đổi kiểu văn bản', img:'images/test1-p5-c4-th-buoc2.png', imgResult:'images/test1-p5-c4-da-buoc2.png', width:'100%', hotspot:{x:50,y:1,w:65,h:25} }, 
+{ text:'Bước 3. Nháy chọn mở rộng kiểu ▼ và kiểu văn bản', img:'images/test1-p5-c4-th-buoc3.png', imgResult:'images/test1-p5-c4-da-buoc4.png', width:'100%', hotspot:{x:486,y:68,w:20,h:25 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Styletext.png',
+	stage1Label: 'mở rộng Style văn bản',
+	stage2Label: 'lệnh',
+	menuWidth: '',
+       	hotspots: [
+           { x: 217, y: 60, w: 71, h: 60, label: 'Intense Emphasis' },
+           { x: 287, y: 3, w: 71, h: 56, label: 'Title' },
+           { x: 146, y: 2, w: 69, h: 60, label: 'Heading 1' }
+       		],
+       correctIndex: 2   }},
+{ text:'Bước 4. Nháy chọn Thẻ ... cần cập nhật Mục lục', img:'images/test1-p5-c4-th-buoc5.png', imgResult:'images/test1-p5-c4-da-buoc5.png', width:'100%', hotspot:{x:302,y:2.5,w:75,h:27} }, 
+{ text:'Bước 5. Nháy chọn lệnh cập nhật Mục lục', img:'images/test1-p5-c4-th-buoc6.png', imgResult:'images/test1-p5-c4-da-buoc6.png', width:'100%', hotspot:{x:65,y:50,w:104,h:32} }, 
+{ text:'Bước 6. Thiết lập cập nhật theo yêu cầu - chọn xác nhận', imgResult:'images/test1-p5-c4-th-buockq.png', imgFinal:'images/test1-p5-c4-th-buockq.png', width:'100%', hotspot:{x:220,y:194,w:130,h:25},
+popupType: 'update-table',   
+popupAnswer: {
+	updatePageOnly:   false,  
+	updateEntireTable: true }},
+{ text:'Ghi chú nhanh: phần thay đổi kiểu văn bản -thuộc nhóm Styles thẻ Home-', imgResult:'images/test1-p5-c4-th-buockq.png', imgFinal:'images/test1-p5-c4-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'mở rộng Styles văn bản',
+	ribbonSub: 'kiểu: Heading 1' }},
+{ text:'Ghi chú nhanh: phần cập nhật mục lục -thuộc nhóm Table of Contents thẻ References', imgResult:'images/test1-p5-c4-th-buockq.png', imgFinal:'images/test1-p5-c4-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_References',
+	ribbonCmd: 'Update Table',
+	ribbonSub: 'kiểu: cập nhật toàn bộ',
+	ribbonSubSub: 'xác nhận cập nhật' }}
+  ] 
+},
+
+{ title:' Câu 5. <b>Change</b> the <u>zoom</u> of the document to <b>98%</b>.',
+titleVi:'Câu 5. Thay đổi mức <u>Zoom</u> của tài liệu thành <b>98%<b>.', 
+correctStep1:2, step1Group: 'A', imgResult1:'images/test1-p1-c1-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2. Nháy chọn Thẻ ... cần thay đổi % thu phóng', img:'images/test1-p5-c5-th-buoc2.png', imgResult:'images/test1-p5-c5-da-buoc2.png', width:'100%', hotspot:{x:528,y:2,w:42,h:25} }, 
+{ text:'Bước 3. Nháy chọn lệnh thu phóng', img:'images/test1-p5-c5-th-buoc3.png', imgResult:'images/test1-p5-c5-da-buoc3.png', width:'100%', hotspot:{x:324,y:31.5,w:50,h:63} }, 
+{ text:'Bước 4. Thiết lập % thu phóng theo yêu cầu - chọn xác nhận', imgResult:'images/test1-p5-c5-th-buockq.png', imgFinal:'images/test1-p5-c5-th-buockq.png', width:'100%', hotspot:{x:626,y:217,w:80,h:22} ,
+popupType: 'zoom',
+popupAnswer: {
+	zoomCustom:true, 
+	percent: 98   }},
+{ text:'Ghi chú nhanh: các thao tác thu phóng tài liệu -thuộc nhóm Zoom thẻ View-', imgResult:'images/test1-p5-c5-th-buockq.png', imgFinal:'images/test1-p5-c5-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_View',
+	ribbonCmd: 'Zoom',
+	ribbonSub: 'chọn % theo yêu cầu'}}
+ 	] 
+},
+
+{ title:' Câu 6. <u>Highlight</u> the text in the <b>row of the table</b> <u>beginning</u> with <b>Sunday</b> to <u>Dark Yellow</u>.',
+titleVi:'Câu 6. <u>Highlight</u> văn bản trong dòng của bảng bắt đầu bằng <b>Sunday</b> thành <u>màu</u> <b>Dark Yellow</b>.', 
+correctStep1:1, step1Group: 'A', imgResult1:'images/test1-p5-c6-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chọn dòng cần Highlight', img:'images/test1-p5-c6-th-buoc2.png', imgResult:'images/test1-p5-c6-da-buoc1.png', width:'100%', hotspot:{x:572,y:28,w:65,h:25},
+popupType: 'table-row-selection',
+popupAnswer: {
+   tableTitle: 'Once your yard is planted, keep a diary of how the plants perform. If you have any problems or questions, contact us. We can help! Our office hours are as follows:',
+ 	targetTableRow: 4, 
+    	tableData: [       
+     		['Monday Friday','8:00am to 5:00pm'],
+     		['Tuesday','8:00am to 5:00pm'],
+     		['Saturday Friday','8:00am to 6:00pm'],
+     		['Sunday','	Closed']  ]
+	}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần Highlight', img:'images/test1-p5-c6-th-buoc2.png', imgResult:'images/test1-p5-c6-da-buoc2.png', width:'100%', hotspot:{x:54,y:0,w:50,h:30} }, 
+{ text:'Bước 3. Nháy chọn nhóm lệnh ▼ và Tên màu Highlight', img:'images/test1-p5-c6-th-buoc3.png', imgResult:'images/test1-p5-c6-th-buockq.png', width:'100%', hotspot:{x:305,y:55,w:35,h:30 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Highlight.png',
+	stage1Label: 'nhóm Font',
+	stage2Label: 'lệnh',
+	menuWidth: '',
+       	hotspots: [
+           { x: 0, y: -2, w: 30, h: 30, label: 'Yellow' },
+           { x: 59, y: 0, w: 30, h: 30, label: 'Turquoise' },
+           { x: 0, y: 29, w: 30, h: 30, label: 'Red' },
+           { x: 59, y: 29, w: 30, h: 30, label: 'Teal' },
+           { x: 90, y: 29, w: 30, h: 30, label: 'Violet' },
+           { x: 30, y: 60, w: 30, h: 30, label: 'Dark Yellow' },
+           { x: 60, y: 60, w: 30, h: 30, label: 'Gray-50%' },
+           { x: 120, y: 60, w: 30, h: 30, label: 'Black' }
+       		],
+       correctIndex: 5   }},
+{ text:'Ghi chú nhanh: các thao tác làm nổi bật văn bản -thuộc nhóm Font thẻ Home-', imgResult:'images/test1-p5-c6-th-buockq.png', imgFinal:'images/test1-p5-c6-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'mởR icon Text Highlight Color',
+	ribbonSub: 'màu: Dark Yellow' }}
+   	] 
+},
+],
+
+/* ===== PROJECT 6 ===== */
+[
+{ title:'Câu 1. Apply <u>Circuit</u> <b>theme</b> to the entire document.',
+titleVi:'Câu 1. Áp dụng <b>chủ đề</b> <u>Organic</u> cho toàn bộ tài liệu.', 
+correctStep1:2, step1Group: 'A', imgResult1:'images/test1-p1-c1-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2. Nháy chọn Thẻ ... cần thay đổi chủ đề', img:'images/test1-p6-c1-th-buoc2.png', imgResult:'images/test1-p6-c1-da-buoc2.png', width:'100%', hotspot:{x:169,y:1,w:60,h:30} }, 
+{ text:'Bước 3. Nháy nhóm lệnh ▼ và Tên chủ đề', img:'images/test1-p6-c1-th-buoc3.png', imgResult:'images/test1-p6-c1-th-buockq.png', width:'100%', hotspot:{x:4,y:28,w:50,h:70 },
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Themes.png',
+	stage1Label: 'nhóm Document Formatting',
+	stage2Label: 'lệnh',
+	menuWidth: '',
+       	hotspots: [
+           { x: 7, y: 5, w: 63, h: 67, label: 'Circui' },
+           { x: 82, y: 77, w: 62, h: 62, label: 'Gallery' },
+           { x: 83, y: 210, w: 62, h: 62, label: 'Vapor Trail' }
+       		],
+       correctIndex: 0   }},
+{ text:'Ghi chú nhanh: các thao tác thay đổi chủ đề -thuộc nhóm Document Formatting thẻ Design-', imgResult:'images/test1-p6-c1-th-buockq.png', imgFinal:'images/test1-p6-c1-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Design',
+	ribbonCmd: 'mở rộng Themes',
+	ribbonSub: 'chủ đề: Organic' }}
+] 
+},
+
+{ title:'Câu 2. <b>Change</b> the formatting of the <u>paragraph</u> following the <b>Budget</b> heading to <u>UPPERCASE</u>.',
+titleVi:'Câu 2. Chuyển toàn bộ ký tự của đoạn văn ngay sau tiêu đề <b>Budget</b> thành <u>UPPERCASE</u>.', 
+correctStep1:1, step1Group: 'A', imgResult1:'images/test1-p6-c2-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chọn đoạn văn bản cần định dạng chữ HOA', img:'images/test1-p6-c2-th-buoc2.png', imgResult:'images/test1-p6-c2-da-buoc1.png', width:'100%', hotspot:{x:113,y:2,w:55,h:30},
+popupType: 'text-selection',
+popupAnswer: {
+    lineAboveText: 'Budget',
+    lineBelowText: 'Principal Report',
+    textParagraph: 'The budget for the current school year was distributed by August Bergqvist, PTA Treasurer, and reviewed by the board and PTA members at the last meeting. In tonight’s meeting,...',
+    targetParagraph: 'main-text',
+	textParagraph2: 'Principal Ian Hansson presented his report.',
+    isTripleClick: true,
+    isDoubleClick: false,
+    isDrag: false,
+	fontSize: { dong1: '18pt', dong2: '18pt', doan1: '14pt', doan2: '14pt' }
+	}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần định dạng chữ HOA', img:'images/test1-p6-c2-th-buoc2.png', imgResult:'images/test1-p6-c2-da-buoc2.png', width:'100%', hotspot:{x:53,y:2,w:57,h:25} }, 
+{ text:'Bước 3. Nháy chọn nhóm lệnh ▼ và lệnh định dạng chữa HOA', img:'images/test1-p6-c2-th-buoc3.png', imgResult:'images/test1-p6-c2-th-buockq.png', width:'100%', hotspot:{x:307,y:28,w:37,h:34 },
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Changecase.png',
+	stage1Label: 'nhóm Font',
+	stage2Label: 'lệnh',
+	menuWidth: '240px',
+       	hotspots: [
+           { x: 0, y: 2, w: 101, h: 21, label: '' },
+           { x: 0, y: 24, w: 101, h: 23, label: '' },
+           { x: 0, y: 49, w: 101, h: 23, label: '' }
+       		],
+       correctIndex: 2   }},
+{ text:'Ghi chú nhanh: các thao tác định dạng chữ HOA -thuộc nhóm Font thẻ Home-', imgResult:'images/test1-p6-c2-th-buockq.png', imgFinal:'images/test1-p6-c2-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'mở rộng icon Change case',
+	ribbonSub: 'kiểu: UPPERCASE' }}
+	] 
+},
+
+{ title:'Câu 3. Apply <b>Center</b> <u>Vertical alignment</u> to the entire document.',
+titleVi:'Câu 3. Áp dụng <u>Vertical alignment</u> là <b>Center</b> cho toàn bộ tài liệu.', 
+correctStep1:2, step1Group: 'A', imgResult1:'images/test1-p1-c1-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2. Nháy chọn Thẻ ... cần căn chỉnh tài liệu', img:'images/test1-p6-c3-th-buoc2.png', imgResult:'images/test1-p6-c3-da-buoc2.png', width:'100%', hotspot:{x:241,y:1,w:50,h:25} }, 
+{ text:'Bước 3. Nháy chọn mở rộng hộp thoại thiết lập trang ▼', img:'images/test1-p6-c3-th-buoc3.png', imgResult:'images/test1-p6-c3-da-buoc3.png', width:'100%', hotspot:{x:301,y:96,w:30,h:30} }, 
+{ text:'Bước 4. Nháy chọn tab ... căn chỉnh tài liệu', img:'images/test1-p6-c3-th-buoc4.png', imgResult:'images/test1-p6-c3-da-buoc4.png', width:'100%', hotspot:{x:346,y:156,w:50,h:22} },
+{ text:'Bước 5. Thiết lập căn chỉnh theo yêu cầu - chọn xác nhận', imgResult:'images/test1-p6-c3-th-buockq.png', imgFinal:'images/test1-p6-c3-th-buockq.png', width:'100%', hotspot:{x:428,y:368,w:97,h:25},
+popupType: 'page-setup',
+popupAnswer: {
+  visibleTabs: ['Layout'],       
+  		sectionStart: 'New page',
+  		differentOddEven: false,
+  		differentFirstPage: false,
+  		headerFromEdge: 1.27,
+  		footerFromEdge: 1.27,
+  		vertAlign: 'Center',                        
+ 	applyTo: 'Whole document'    }},
+{ text:'Ghi chú nhanh: các thao tác căn chỉnh tài liệu -thuộc nhóm Page Setup thẻ Layout-', imgResult:'images/test1-p6-c3-th-buockq.png', imgFinal:'images/test1-p6-c3-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Layout',
+	ribbonCmd: 'mở rộng hộp thoại Page Setup',
+	ribbonSub: 'hộp thoại new: tab Layout', 
+	ribbonSubSub: 'mục: Vertical alignment',
+	ribbonSubSubSub: 'vị trí: Center'}}
+	] 
+},
+
+{ title:'Câu 4. At the end of the document, <b>list all sources</b> in a bibliography by <b>inserting</b> <u>bibliography</u> <b>type</b> <u>Works Cited</u>.',
+titleVi:'Câu 4. Ở cuối tài liệu, <b>liệt kê tất cả các nguồn</b> bằng cách <b>chèn</b> <u>Bibliography</u> <b>kiểu</b> <u>Works Cited</u>.', 
+correctStep1:7, step1Group: 'A', imgResult1:'images/test1-p6-c4-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chuột chọn đúng vị trí cần chèn danh mục tham khảo', img:'images/test1-p6-c4-th-buoc1.png', imgResult:'images/test1-p6-c4-da-buoc1.png', width:'100%', hotspot:{x:5,y:331,w:564,h:36}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần chèn danh mục', img:'images/test1-p6-c4-th-buoc2.png', imgResult:'images/test1-p6-c4-da-buoc2.png', width:'100%', hotspot:{x:298,y:0.5,w:88.5,h:23} }, 
+{ text:'Bước 3. Nháy chọn nhóm lệnh ▼ và lệnh chèn danh mục', img:'images/test1-p6-c4-th-buoc3.png', imgResult:'images/test1-p6-c4-da-buoc4.png', width:'100%', hotspot:{x:407,y:75,w:100,h:25 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Danhmuc.png',
+	stage1Label: 'nhóm Bibliography',
+	stage2Label: 'lệnh',
+	menuWidth: '320px',
+       	hotspots: [
+           { x: 0, y: 113, w: 291, h: 86, label: 'References' },
+           { x: 0, y: 208, w: 291, h: 96, label: 'Works Cited' },
+           { x: 0, y: 17, w: 290, h: 86, label: 'Bibliography' }
+       		],
+       correctIndex: 1   }},
+{ text:'Ghi chú nhanh: các thao tác danh mục tham khảo -thuộc nhóm Citations & Bibliography thẻ References-', imgResult:'images/test1-p6-c4-th-buockq.png', imgFinal:'images/test1-p6-c4-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_References',
+	ribbonCmd: 'mở rộng Bibliography',
+	ribbonSub: 'kiểu: Works Cited'}}
+         	] 
+},
+],
+
+/* ===== PROJECT 7 ===== */
+[
+{ title:'Câu 1. Format the title, <b>OFFICE-BASED AGENCY</b> as a <u>WordArt</u> text box. Use the <u>style</u> <b>Fill – White, Outline Accent 5, Shadow</b>.',
+titleVi:'Câu 1. Định dạng tiêu đề <b>OFFICE-BASED AGENCY</b> thành <u>WordArt</u>. Sử dụng <u>kiểu</u> <b>Fill – White, Outline Accent 1, Shadow</b>.', 
+correctStep1:1, step1Group: 'A', imgResult1:'images/test1-p7-c1-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chọn Tiêu đề cần định dạng chữ nghệ thuật', img:'images/test1-p7-c1-th-buoc2.png', imgResult:'images/test1-p7-c1-da-buoc1.png', width:'100%', hotspot:{x:113,y:2,w:55,h:30},
+popupType: 'text-selection',
+popupAnswer: {
+	lineAboveText: '', 
+    	lineBelowText: 'Startup Checklist',
+    textParagraph: 'OFFICE-BASED AGENCY',
+    textParagraph2: 'Getting Started',
+    isDoubleClick: false,
+    isTripleClick: true,
+    isDrag: false,
+	fontSize: { dong1: '18pt', dong2: '14pt', doan1: '24pt', doan2: '14pt' }
+	}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần chèn chữ nghệ thuật', img:'images/test1-p7-c1-th-buoc2.png', imgResult:'images/test1-p7-c1-da-buoc2.png', width:'100%', hotspot:{x:113,y:2,w:55,h:30} }, 
+{ text:'Bước 3. Nháy chọn nhóm lệnh ▼ và kiểu chữ nghệ thuật', img:'images/test1-p7-c1-th-buoc3.png', imgResult:'images/test1-p7-c1-da-buoc4.png', width:'100%', hotspot:{x:305,y:46,w:70,h:23 },
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Wordart.png',
+	stage1Label: 'nhóm Text',
+	stage2Label: 'lệnh',
+	menuWidth: '',
+	hotspots: [
+		{ x: 0, y: -1, w: 50, h: 50, label: 'Fill - Black, Text color 1, Shadow' },
+		{ x: 53, y: -1, w: 50, h: 50, label: 'Fill - Blue, Accent color 5, Shadow' },
+		{ x: 109, y: 0, w: 50, h: 50, label: 'Fill - Orange, Accent color 5,...' },
+		{ x: 165, y: 0, w: 50, h: 50, label: 'Fill - White, Accent color 5, Shadow' },
+		{ x: 220, y: 1, w: 50, h: 50, label: 'Fill - Glow, Accent color 4, Soft Bevel' },
+		{ x: -1, y: 56, w: 50, h: 50, label: 'Gradient Fill, Gray' },
+		{ x: 165, y: 56, w: 50, h: 50, label: 'Fill - White, Outline Blue, Accent color 1,...' },
+		{ x: 165, y: 112, w: 50, h: 50, label: 'Fill - White, Outline Orange, Accent color 2,...' }
+	],
+	correctIndex: 3 }},
+{ text:'Ghi chú nhanh: các thao tác chèn chữ nghệ thuật -thuộc nhóm Text thẻ Insert-', imgResult:'images/test1-p7-c1-th-buockq.png', imgFinal:'images/test1-p7-c1-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Insert',
+	ribbonCmd: 'mở rộng WordArt',
+	ribbonSub: 'tên WordArt: Fill White',
+	ribbonSubSub: 'kiểu WordArt: theo yêu cầu' }}
+]
+},
+
+{ title:'Câu 2. <b>Add</b> the <u>current date</u> to the <u>left</u> <b>footer</b> of the entire document <b>except the first page</b>. The date will be <u>updated automatically</u>. Accept all other <u>default settings</u>. <br>(<u>Chú ý</u>: không yêu cầu chèn Footer, là ngầm định Footer đã có)',
+titleVi:'Câu 2. Thêm <u>Date & Time</u> hiện tại vào <u>bên trái</u> <b>Footer</b> của toàn bộ tài liệu, <b>ngoại trừ trang đầu tiên</b>. Ngày sẽ được <u>cập nhật tự động</u>. Giữ nguyên các <u>thiết lập mặc định</u> khác.(Chú ý: không yêu cầu chèn Footer, là ngầm định Footer đã có)', 
+correctStep1:7, step1Group: 'A', imgResult1:'images/test1-p7-c2-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2 (cách 2 thay nháy đúp Footer). Nháy chọn Thẻ ... chỉnh sửa Footer', img:'images/test1-p7-c2-th-buoc2.png', imgResult:'images/test1-p7-c2-da-buoc2.png', width:'100%', hotspot:{x:114,y:1,w:55,h:30} }, 
+{ text:'Bước 3 (cách 2 thay nháy đúp Footer). Nháy chọn nhóm lệnh ▼ và lệnh chỉnh sửa Footer', img:'images/test1-p7-c2-th-buoc3.png', imgResult:'images/test1-p7-c2-da-buoc4.png', width:'100%', hotspot:{x:163,y:43,w:78,h:26 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Footer.png',
+	stage1Label: 'nhóm Header & Footer',
+	stage2Label: 'lệnh',
+	menuWidth: '340px',
+	hotspots: [
+		{ x: 0, y: 71, w: 260, h: 66, label: '' },
+		{ x: 0, y: 1, w: 260, h: 66, label: '' },
+		{ x: 0, y: 155, w: 260, h: 22, label: '' }
+	],
+	correctIndex: 2 }},
+{ text:'Bước 4. Trên Tools Header & Footer, tùy chọn bỏ trang 1 + di chuyển trang tiếp theo + chèn thời gian (chọn 3 vị trí)', img:'images/test1-p7-c2-th-buoc5.png', imgResult:'images/test1-p7-c2-th-buockq.png', width:'100%', hotspot:{x:68,y:45,w:110,h:25 }, 
+popupType: 'multi-hotspot',
+popupAnswer: {
+	hotspots: [
+		{ x:472, y:47, w:120, h:25, label:'Different First Page' },
+		{ x:368, y:66, w:70, h:26, label:'Next' },
+		{ x:70, y:48, w:42, h:70, label:'Date Time' }
+	]
+}},
+{ text:'Bước 5. Thiết lập theo yêu cầu ((cập nhật + xác nhận) + đóng Footer), chọn 3 vị trí', img:'images/test1-p7-c2-th-buoc8.png', imgResult:'images/test1-p7-c2-th-buockq.png', width:'100%', hotspot:{x:473,y:466,w:75,h:22 }, 
+popupType: 'multi-hotspot',
+popupAnswer: {
+	hotspots: [
+		{ x:550, y:46, w:83, h:92, label:'Đóng Footer' },
+		{ x:372, y:342, w:150, h:25, label:'Chọn cập nhật' },
+		{ x:369, y:371, w:75, h:23, label:'Chọn xác nhận' }
+	]
+}},
+{ text:'Ghi chú nhanh: phần chỉnh sửa Footer -thuộc nhóm Header & Footer thẻ Insert', imgResult:'images/test1-p7-c2-th-buockq.png', imgFinal:'images/test1-p7-c2-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Insert',
+	ribbonCmd: 'mở rộng Footer',
+	ribbonSub: 'Edit Footer'}},
+{ text:'Ghi chú nhanh: phần cập nhật tự động ngày giờ -Tools Header & Footer-', imgResult:'images/test1-p7-c2-th-buockq.png', imgFinal:'images/test1-p7-c2-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'Tools Header & Footer',
+	ribbonCmd: 'bỏ qua trang 1: Different First Page - Next',
+	ribbonSub: 'chọn vị trí - chèn Date & Time',
+	ribbonSubSub: 'chọn Update automatically',
+	ribbonSubSubSub: 'kiểu: Date & Time - xác nhận'}}
+] 
+},
+
+{ title:'Câu 3. <u>Above</u> the <b>Committing to Your Business</b> heading, <u>insert table of figure</u> with <b>Figure</b> <u>caption label</u> and <b>hyphen</b> <u>tab leader</u>. Do not change the other settings.',
+titleVi:'Câu 3. Phía trên tiêu đề <b>Committing to Your Business</b>, <u>chèn Table of Figures</u> sử dụng <u>nhãn</u> <b>Figure</b> và <u>tab leader</u> là <b>Hyphen (dấu gạch nối)</b>. Không thay đổi các thiết lập khác.', 
+correctStep1:7, step1Group: 'A', imgResult1:'images/test1-p7-c3-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chuột chọn đúng vị trí cần chèn Danh mục hình', img:'images/test1-p7-c3-th-buoc1.png', imgResult:'images/test1-p7-c3-da-buoc1.png', width:'100%', hotspot:{x:2,y:387,w:564,h:23}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần chèn danh mục hình', img:'images/test1-p7-c3-th-buoc2.png', imgResult:'images/test1-p7-c3-da-buoc2.png', width:'100%', hotspot:{x:304,y:1,w:74,h:24} }, 
+{ text:'Bước 3. Nháy chọn lệnh chèn danh mục hình', img:'images/test1-p7-c3-th-buoc3.png', imgResult:'images/test1-p7-c3-da-buoc3.png', width:'100%', hotspot:{x:53,y:26.5,w:148,h:27} }, 
+{ text:'Bước 4. Thiết lập Danh mục hình theo yêu cầu - xác nhận chèn', imgResult:'images/test1-p7-c3-th-buockq.png', imgFinal:'images/test1-p7-c3-th-buockq.png', width:'100%', hotspot:{x:594,y:397,w:80,h:22},
+popupType: 'insert-tof',
+popupAnswer: {
+	tabTableOfFigures: true,
+	showPageNumbers: true,
+	rightAlignPageNumbers: true,
+	useHyperlinks: true,
+	leaderDash: true,
+	labelFigure: true,
+	formatFromTemplate: true,
+	includeLabelNumber: true }},
+{ text:'Ghi chú nhanh: các thao tác chèn Danh mục hình -thuộc nhóm Insert Caption thẻ References-', imgResult:'images/test1-p7-c3-th-buockq.png', imgFinal:'images/test1-p7-c3-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_References',
+	ribbonCmd: 'Insert Table Of Figures',
+	ribbonSub: 'mục Tab leader: - - - (hyphen)',
+	ribbonSubSub: 'nhãn: Figure'}}
+] 
+},
+
+{ title:'Câu 4. <u>Remove background</u> of the <b>picture</b> on the last page, <b>be careful not to crop the dog</b>.',
+titleVi:'Câu 4. <u>Xóa nền</u> của <b>hình ảnh</b> ở trang cuối. <b>Lưu ý</b> không cắt mất phần con chó.', 
+correctStep1:6, step1Group: 'A', imgResult1:'images/test1-p7-c4-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chọn hình ảnh cần xóa nền', img:'images/test1-p7-c4-th-buoc1.png', imgResult:'images/test1-p7-c4-da-buoc1.png', width:'100%', hotspot:{x:8,y:295,w:186,h:166 }}, 
+{ text:'Bước 2. Nháy chọn Tools ... cần xóa nền hình ảnh', img:'images/test1-p7-c4-th-buoc2.png', imgResult:'images/test1-p7-c4-da-buoc2.png', width:'100%', hotspot:{x:500,y:27,w:73,h:22.5} }, 
+{ text:'Bước 3. Nháy chọn lệnh xóa nền và lệnh tùy chỉnh ảnh', img:'images/test1-p7-c4-th-buoc3.png', imgResult:'images/test1-p7-c4-da-buoc4.png', width:'100%', hotspot:{x:1,y:53,w:55,h:60}, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Background.png',
+	stage1Label: 'nhóm Background Removal',
+	stage2Label: 'lệnh',
+	menuWidth: '300px',
+	hotspots: [
+		{ x: 1, y: -1, w: 69, h: 81, label: '' },
+		{ x: 65, y: -1, w: 69, h: 81, label: '' },
+		{ x: 241, y: -1, w: 56, h: 78, label: '' }
+	],
+	correctIndex: 0 }},
+{ text:'Bước 4. Giữ và kéo thả vị trí cần điều chỉnh - chọn xác nhận dưới hình (Hướng dẫn. kéo ở giữa xuống hoặc kéo gốc vuông)', img:'images/test1-p7-c4-th-buoc6.png', imgResult:'images/test1-p7-c4-th-buockq.png', imgFinal:'images/test1-p7-c4-th-buockq.png', width:'100%', hotspot:{x:84,y:478,w:30,h:30 }, 
+popupType: 'remove-background',
+popupAnswer: {
+	initialBox: { x: 26, y: 354, w: 157, h: 140 }, 
+	targetX: 26, 
+	targetY: 354, 
+	targetW: 173, 
+	targetH: 156,
+	tolerance: 15 }},
+{ text:'Ghi chú nhanh: các thao tác xóa nền hình ảnh -thuộc nhóm Adjust thẻ Tools Picture-', imgResult:'images/test1-p7-c4-th-buockq.png', imgFinal:'images/test1-p7-c4-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'Tools Picture',
+	ribbonCmd: 'Remove Background',
+	ribbonSub: 'chọn Mark Areas to Keep',
+	ribbonSubSub: 'chỉnh sửa: kéo 1 phần - kéo hết',
+	ribbonSubSubSub: 'chọn xác nhận: Keep Changes'}}
+] 
+},
+
+{ title:'Câu 5. <u>Copy only text</u> (without formatting) of <b>second paragraph</b> <u>below</u> the <b>Sustaining Your Business</b> heading to the <u>after</u> <b>graphic</b>.',
+titleVi:'Câu 5. <u>Sao chép duy nhất văn bản</u> (không kèm định dạng) của <b>đoạn văn thứ hai</b> <u>bên dưới</u> tiêu đề <b>Sustaining Your Business</b> đến <u>phía sau</u> <b>hình đồ họa</b>.', 
+correctStep1:1, step1Group: 'A', imgResult1:'images/test1-p7-c5-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chọn đoạn cần sao chép', img:'images/test1-p7-c5-th-buoc2.png', imgResult:'images/test1-p7-c5-da-buoc1.png', width:'100%', hotspot:{x:113,y:2,w:55,h:30},
+popupType: 'text-selection',
+popupAnswer: {
+    lineAboveText: 'Sustaining Your Business', 
+    lineBelowText: '',
+    textParagraph: 'Keep track of strateige that worked and flopped to fine tune your marketing...',
+    textParagraph2: 'Maintain and nurture your repeat business. Remember, it costs 80% less to maintain a current relationship than to develop a new one.',
+    targetParagraph: 'main-text-2', 
+    isTripleClick: true,
+    isDoubleClick: false,
+    isDrag: false,
+	fontSize: { dong1: '18pt', dong2: '18pt', doan1: '14pt', doan2: '14pt' }
+	}},
+{ text:'Bước 2. Nháy chọn Thẻ ... cần sao chép văn bản', img:'images/test1-p7-c5-th-buoc2.png', imgResult:'images/test1-p7-c5-da-buoc2.png', width:'100%', hotspot:{x:2.5,y:23,w:60,h:29} }, 
+{ text:'Bước 3. Nháy chọn lệnh sao chép', img:'images/test1-p7-c5-th-buoc3.png', imgResult:'images/test1-p7-c5-da-buoc3.png', width:'100%', hotspot:{x:37,y:47,w:60,h:25} }, 
+{ text:'Bước 4. Nháy chuột chọn đúng vị trí cần dán văn bản', img:'images/test1-p7-c5-th-buoc4.png', imgResult:'images/test1-p7-c5-da-buoc4.png', width:'100%', hotspot:{x:1,y:485,w:567,h:27} },
+{ text:'Bước 5. Nháy chọn nhóm lệnh ▼ và kiểu dán chỉ có văn bản ', img:'images/test1-p7-c5-th-buoc5.png', imgResult:'images/test1-p7-c5-th-buockq.png', width:'100%', hotspot:{x:4,y:28,w:39,h:67},
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Paste.png',
+	stage1Label: 'nhóm Clipboard',
+	stage2Label: 'lệnh',
+	menuWidth: '280px',
+	hotspots: [
+		{ x: 1, y: 22, w: 30, h: 30, label: 'Keep Source Formating' },
+		{ x: 32, y: 22, w: 30, h: 30, label: 'Merge Formatting' },
+		{ x: 63, y: 22, w: 30, h: 30, label: 'Keep Text Only' }
+	],
+	correctIndex: 2 }},
+{ text:'Ghi chú nhanh: thao tác sao chép văn bản -thuộc nhóm Clipboard thẻ Home-', imgResult:'images/test1-p7-c5-th-buockq.png', imgFinal:'images/test1-p7-c5-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Home',
+	ribbonCmd: 'Copy',
+	ribbonSub: 'chọn vị trí cần paste',
+	ribbonSubSub: 'mở rộng Paste',
+	ribbonSubSubSub: 'kiểu dán: Keep text only' }}
+] 
+},
+
+{ title:'Câu 6. <b>Check</b> the document for <u>Accessibility</u> and <b>correct only</b> the errors in <u>Errors section</u>.',
+titleVi:'Câu 6. <b>Kiểm tra</b> <u>Accessibility</u> của tài liệu và <b>chỉ sửa các lỗi</b> trong <u>mục Errors</u>.', 
+correctStep1:2, step1Group: 'A', imgResult1:'images/test1-p7-c6-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2. Nháy chọn Thẻ ... chứa khả năng tiếp cận tài liệu', img:'images/test1-p7-c6-th-buoc2.png', imgResult:'images/test1-p7-c6-da-buoc2.png', width:'100%', hotspot:{x:2.7,y:0.7,w:40,h:30} }, 
+{ text:'Bước 3. Nháy chọn lệnh chứa thông tin', img:'images/test1-p7-c6-th-buoc3.png', imgResult:'images/test1-p7-c6-da-buoc3.png', width:'100%', hotspot:{x:2.3,y:30,w:102,h:36 }}, 
+{ text:'Bước 4. Nháy chọn nhóm lệnh ▼ và lệnh kiểm tra khả năng tiếp cận', img:'images/test1-p7-c6-th-buoc4.png', imgResult:'images/test1-p7-c6-da-buoc5.png', width:'100%', hotspot:{x:145,y:200,w:85,h:83 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Inspect.png',
+	stage1Label: 'nhóm Info',
+	stage2Label: 'lệnh',
+	menuWidth: '',
+	hotspots: [
+		{ x: 0, y: 0, w: 217, h: 57, label: '' },
+		{ x: 0, y: 60, w: 217, h: 54, label: '' },
+		{ x: 0, y: 118, w: 217, h: 56, label: '' }
+	],
+	correctIndex: 1 }},
+{ text:'Bước 5. Nháy chọn lỗi cần sửa (minh họa lỗi Table, bài thi hướng dẫn cách sửa chữa tại Additional Information bên dưới)', img:'images/test1-p7-c6-th-buoc6.png', imgResult:'images/test1-p7-c6-th-buockq.png', imgFinal:'images/test1-p7-c6-th-buockq.png', width:'100%', hotspot:{x:295,y:234,w:97,h:25}},
+{ text:'Ghi chú nhanh: các thao tác kiểm tra tiếp cận tài liệu -thuộc nhóm Info thẻ File-', imgResult:'images/test1-p7-c6-th-buockq.png', imgFinal:'images/test1-p7-c6-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_File',
+	ribbonCmd: 'Info',
+	ribbonSub: 'mở rộng Check for Issues',
+	ribbonSubSub:'mục kiểm tra: Check Accessibility',
+	ribbonSubSubSub:'chọn lỗi - sửa lỗi theo hướng dẫn'}}
+] 
+},
+
+{ title:'Câu 7. <u>Insert</u> an <b>Alternative Text for the Picture</b> with <u>Title</u> is <b>My dog</b> and <u>Description</u> is <b>Lovely Chucky</b>.',
+titleVi:'Câu 7. Thêm <b>Alternative Text cho hình ảnh</b> với <u>Title</u> là <b>My dog</b> và <u>Description</u> là <b>Lovely Chucky</b>.', 
+correctStep1:6, step1Group: 'A', imgResult1:'images/test1-p7-c7-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Thao tác bước 1. Nháy chọn hình ảnh cần thêm Tiêu đề-Mô tả', img:'images/test1-p7-c7-th-buoc1.png', imgResult:'images/test1-p7-c7-da-buoc1.png', width:'100%', hotspot:{x:28,y:245,w:131,h:137 }}, 
+{ text:'Bước 2. Nháy chọn Tools ... định dạng hình ảnh', img:'images/test1-p7-c7-th-buoc2.png', imgResult:'images/test1-p7-c7-da-buoc2.png', width:'100%', hotspot:{x:499,y:25,w:74,h:27} }, 
+{ text:'Bước 3. Nháy chọn mở rộng hộp thoại kiểu hình ảnh ▼', img:'images/test1-p7-c7-th-buoc3.png', imgResult:'images/test1-p7-c7-da-buoc3.png', width:'100%', hotspot:{x:553,y:132,w:22,h:22} }, 
+{ text:'Bước 4. Nháy chọn thuộc tính hình ảnh (nhập tiêu đề - mô tả hình ảnh)', imgResult:'images/test1-p7-c7-th-buockq.png', imgFinal:'images/test1-p7-c7-th-buockq.png', width:'100%', hotspot:{x:275,y:396,w:97,h:25},
+popupType: 'alt-text',
+popupAnswer:{
+	iconFill:false,
+	iconEffects:false,
+	iconLayout:true,
+	iconPicture:false}},
+{ text:'Ghi chú nhanh: các thao tác thêm văn bản thay thế cho Hình ảnh -thuộc nhóm Picture Styles thẻ Tools Picture-', imgResult:'images/test1-p7-c7-th-buockq.png', imgFinal:'images/test1-p7-c7-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'Tools Picture',
+	ribbonCmd: 'mở rộng hộp thoại Picture Styles',
+	ribbonSub: 'Layout & Properties', 
+	ribbonSubSub: 'mục Alt Text',
+	ribbonSubSubSub: 'nhập tên tiêu đề - mô tả'}}
+] 
+},
+
+{ title:'Câu 8. <b>Show all hidden symbols</b> in this document.',
+titleVi:'Câu 8. <b>Hiển thị tất cả các kí hiệu ẩn</b> trong tài liệu.',
+correctStep1:2, step1Group: 'A', imgResult1:'images/test1-p1-c1-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2. Nháy chọn Thẻ ... cần thiết lập hiển thị kí hiệu', img:'images/test1-p7-c8-th-buoc2.png', imgResult:'images/test1-p7-c8-da-buoc2.png', width:'100%', hotspot:{x:3,y:2,w:41,h:29} }, 
+{ text:'Bước 3. Nháy chọn lệnh tùy chỉnh và mục chứa kí hiệu cần hiển thị', img:'images/test1-p7-c8-th-buoc3.png', imgResult:'images/test1-p7-c8-da-buoc4.png', width:'100%', hotspot:{x:1,y:413,w:103,h:29 }, 
+popupType: 'picture-click',
+popupAnswer: {
+	midImage: 'images/Mucoption.png',
+	stage1Label: 'nhóm Option',
+	stage2Label: 'lệnh',
+	menuWidth: '280px',
+	hotspots: [
+		{ x: 7, y: 64, w: 75, h: 29, label: '' },
+		{ x: 7, y: 93, w: 75, h: 28, label: '' },
+		{ x: 7, y: 171, w: 76, h: 31, label: '' }
+	],
+	correctIndex: 0 }},
+{ text:'Bước 4. Thiết lập tùy chỉnh theo yêu cầu - chọn xác nhận', imgResult:'images/test1-p7-c8-th-buockq.png', imgFinal:'images/test1-p7-c8-th-buockq.png', width:'100%', hotspot:{x:275,y:396,w:97,h:25},
+popupType: 'word-display',
+popupAnswer:{
+	tabChars: false,
+	spaces: false,
+	paragraphMarks: false,
+	hiddenText: false,
+	optionalHyphens: false,
+	objectAnchors: false,
+	showAllMarks: true }},
+{ text:'Ghi chú nhanh: các thao tác hiển thị kí hiệu -thuộc nhóm Option thẻ File-', imgResult:'images/test1-p7-c8-th-buockq.png', imgFinal:'images/test1-p7-c8-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_File',
+	ribbonCmd: 'Option',
+	ribbonSub: 'danh mục: Display', 
+	ribbonSubSub: 'mục: Always show these formatting ...',
+	ribbonSubSubSub: 'chọn Show all formatting marks'}}
+      ] 
+},
+] /* project cuối cùng không có , */
+];/* cuối mỗi phiên bản luôn luôn có ; */
+
+/* so sánh giao diện phần nào khác, thì đổi câu hỏi phần đó */
+const DELTA_2019 = [ 
+[null,null,null,null,null, // ← Câu 1, 2, 3, 4, 5: giữ nguyên
+{ title:'Câu 6_W19. Format the title, <b>OFFICE-BASED AGENCY</b> as a <u>WordArt</u> text box. Use the <u>style</u> <b>Fill – White, Outline Accent 1, Shadow</b>.',
+titleVi:'Câu 6_W19. Định dạng tiêu đề <b>OFFICE-BASED AGENCY</b> thành <u>WordArt</u>. Sử dụng <u>kiểu</u> <b>Fill – White, Outline Accent 1, Shadow</b>.', 
+correctStep1:1, step1Group: 'A', imgResult1:'images/test1-p7-c1-da-buoc1.png', video:'video-link', 
+steps:[ 
+{ text:'Bước 2. Nháy chọn Thẻ ... cần chèn chữ nghệ thuật', img:'images/test1-p7-c1-th-buoc2.png', imgResult:'images/test1-p7-c1-da-buoc2.png', width:'100%', hotspot:{x:131,y:1,w:70,h:35} }, 
+{ text:'Bước 3. Nháy chọn nhóm lệnh ... cần chèn', img:'images/test1-p7-c1-th-buoc3.png', imgResult:'images/test1-p7-c1-da-buoc3.png', width:'100%', hotspot:{x:396,y:42,w:90,h:30} },
+{ text:'Bước 4. Nháy chọn kiểu ... cần chèn', img:'images/test1-p7-c1-th-buoc4.png', imgResult:'images/test1-p7-c1-da-buoc4.png', width:'100%', hotspot:{x:583,y:75,w:80,h:45}},
+{ text:'Ghi chú nhanh: các thao tác -thuộc nhóm thẻ-', imgFinal:'images/test1-p7-c1-th-buockq.png', width:'100%', hotspot:{x:554,y:35,w:65,h:80},
+popupType: 'ribbon-only',
+popupAnswer: {
+	ribbonTab: 'tab_Insert',
+	ribbonCmd: 'mở rộng WordArt',
+	ribbonSub: 'tên WordArt: Fill White',
+	ribbonSubSub: 'kiểu WordArt: theo yêu cầu' }}
+      ],	// ← đóng steps, CÓ phẩy
+},	// ← đóng câu 6, CÓ phẩy vì còn câu 7
+    null	// ← Câu 7: giữ nguyên
+],	// ← đóng Project 1, CÓ phẩy vì còn Project 2-7, nếu là project không có dấu phẩy
+    [], [], [], [], [], []   // ← Project 2-7: giữ nguyên
+];	// ← đóng Data_2019, luôn luôn có chấm phẩy ; nguyên tắt giống Data_2016 có dù có sửa hay không
+const DELTA_2021 = [ [], [], [], [], [], [], [] ];
+const DELTA_365  = [ [], [], [], [], [], [], [] ];
+
+function buildProjects(delta){
+    return DATA_2016.map(function(proj2016,pi){
+        const d=delta[pi]||[];
+        if(d.length===0){ return proj2016; }
+        const result=[];
+        for(let qi=0;qi<d.length;qi++){
+            if(d[qi]===null){ if(proj2016[qi]){ result.push(proj2016[qi]); } }
+            else { result.push(d[qi]); }
+        }
+        return result;
+    });
+}
+
+const VERSION_MAP = {
+    '2016': DATA_2016,
+    '2019': buildProjects(DELTA_2019),
+    '2021': buildProjects(DELTA_2021),
+    '365' : buildProjects(DELTA_365)
+};
+
+let PROJECTS = [];
+
+/* =========================================
+   HƯỚNG DẪN SỬ DỤNG
+========================================= */
+function openGuide(){ document.getElementById('guideOverlay').classList.add('show'); }
+function closeGuideBtn(){ document.getElementById('guideOverlay').classList.remove('show'); }
+function closeGuide(e){ if(e.target === document.getElementById('guideOverlay')){ closeGuideBtn(); } }
+
+/* =========================================
+   KHÓA PHIÊN BẢN & DỰ ÁN
+========================================= */
+let versionLocked       = false;
+let projectLocked       = false;
+let completedProjects   = new Set();
+let currentProjectIndex = -1;
+let highestUnlocked     = 0;
+
+function handleVersionChange(ver){
+    if(versionLocked){
+        alert('⚠️ Bạn đã chọn phiên bản rồi!\nKhông thể thay đổi phiên bản trong phiên làm bài này.');
+        document.getElementById('versionSelect').value = document.getElementById('versionSelect').dataset.locked;
+        return;
+    }
+    versionLocked = true;
+    document.getElementById('versionSelect').dataset.locked = ver;
+    document.getElementById('versionSelect').classList.add('select-locked');
+    PROJECTS = VERSION_MAP[ver] || DATA_2016;
+    currentProject = 0; currentQuestion = 0;
+    totalProjectScore = 0; totalProjectMax = 0;
+    resetTimer();
+}
+
+function handleProjectChange(val){
+    const idx = parseInt(val);
+    if(completedProjects.has(idx)){
+        alert('🔒 Project ' + (idx+1) + ' đã hoàn thành!\nVui lòng chọn project khác.');
+        document.getElementById('projectSelect').value = currentProjectIndex >= 0 ? currentProjectIndex : '';
+        return;
+    }
+    if(projectLocked && currentProjectIndex === idx){ return; }
+    projectLocked = true;
+    currentProjectIndex = idx;
+    document.getElementById('questionSelect').classList.remove('hidden-select');
+    lockTestModeBtn();
+    changeProject(idx);
+}
+
+function handleQuestionChange(val){
+    const idx = parseInt(val);
+    if(LOCK_SEQUENCE && idx > highestUnlocked){
+        alert('⚠️ Bạn phải hoàn thành Câu ' + (highestUnlocked+1) + ' trước!\nCâu hỏi phải làm theo thứ tự từ 1 đến ' + PROJECTS[currentProject].length + '.');
+        document.getElementById('questionSelect').value = currentQuestion;
+        return;
+    }
+    loadQuestion(idx);
+}
+
+/* =========================================
+   NGÔN NGỮ
+========================================= */
+let currentLang = 'en';
+
+function toggleLang(){
+    currentLang = (currentLang === 'en') ? 'vi' : 'en';
+    const btn = document.getElementById('langBtn');
+    if(currentLang === 'vi'){
+        btn.textContent = '🌐 VN / EN';
+        btn.classList.add('vi-active');
+    } else {
+        btn.textContent = '🌐 EN / VN';
+        btn.classList.remove('vi-active');
+    }
+    if(currentProjectIndex >= 0){ renderDropdown(); }
+    if(PROJECTS.length > 0){
+        const q = PROJECTS[currentProject][currentQuestion];
+        if(q){
+            const title = (currentLang==='vi' && q.titleVi) ? q.titleVi : q.title;
+            document.getElementById('questionTitle').innerHTML = title;
+        }
+    }
+}
+
+/* =========================================
+   CHẾ ĐỘ TRAINING / TEST
+========================================= */
+let testMode = false;
+
+function toggleTestMode(){
+    const btn = document.getElementById('modeBtn');
+    if(btn.disabled){ return; }
+    testMode = !testMode;
+    if(testMode){
+        btn.innerHTML = '⏱ Test';
+        btn.classList.add('vi-active');
+    } else {
+        btn.innerHTML = '📝 Training';
+        btn.classList.remove('vi-active');
+    }
+}
+
+function lockTestModeBtn(){
+    const btn = document.getElementById('modeBtn');
+    if(!btn){ return; }
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    btn.style.cursor = 'not-allowed';
+}
+
+function getEffectiveLastStepIndex(q){
+    let lastIdx = q.steps.length - 1;
+    if(testMode){
+        while(lastIdx >= 0 && q.steps[lastIdx] && q.steps[lastIdx].popupType === 'ribbon-only'){
+            lastIdx--;
+        }
+    }
+    return lastIdx;
+}
+
+/* =========================================
+STATE & TIMER
+========================================= */
+const LOCK_SEQUENCE = false;
+let currentProject  = 0;
+let currentQuestion = 0;
+let currentStep     = 0;
+const IS_PUBLISHED  = false;
+let debugMode       = false;
+let wrongCount      = [];
+let step1WrongCount = 0;
+let step1Completed  = false;
+let totalProjectScore = 0;
+let totalProjectMax   = 0;
+
+const TIMER_LIMIT_SEC = 60*60;
+let timerSeconds=0, timerInterval=null, timerRunning=false;
+let timerStarted=false, timerTimedOut=false, timerFinished=false;
+
+function formatTime(sec){ const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60; if(h>0){return pad(h)+':'+pad(m)+':'+pad(s);} return pad(m)+':'+pad(s); }
+function pad(n){ return n<10?'0'+n:''+n; }
+function updateStartBtn(){
+    const btn=document.getElementById('startBtn');
+    if(timerFinished){ btn.textContent='🏁 Hoàn thành ⏱ '+formatTime(timerSeconds); btn.className='start-btn stopped'; return; }
+    if(timerTimedOut){ btn.textContent='⏰ Hết giờ ⏱ '+formatTime(timerSeconds); btn.className='start-btn timeout'; return; }
+    if(!timerStarted){ btn.textContent='▶ Bắt đầu ⏱ 00:00'; btn.className='start-btn'; return; }
+    if(timerRunning){ btn.textContent='⏸ '+formatTime(timerSeconds); btn.className='start-btn running'; }
+    else { btn.textContent='▶ Tiếp tục ⏱ '+formatTime(timerSeconds); btn.className='start-btn'; }
+}
+function timerTick(){ timerSeconds++; if(timerSeconds>=TIMER_LIMIT_SEC){ timerSeconds=TIMER_LIMIT_SEC; timerTimedOut=true; stopTimer(); document.getElementById('timeoutBanner').style.display='block'; } updateStartBtn(); }
+function startTimer(){ if(timerTimedOut||timerFinished||timerRunning){return;} timerRunning=true; timerStarted=true; timerInterval=setInterval(timerTick,1000); updateStartBtn(); }
+function stopTimer(){ if(!timerRunning){return;} timerRunning=false; clearInterval(timerInterval); timerInterval=null; updateStartBtn(); }
+function finishTimer(){ stopTimer(); timerFinished=true; updateStartBtn(); }
+function handleStartBtn(){ if(timerFinished||timerTimedOut){return;} if(!timerStarted||!timerRunning){startTimer();}else{stopTimer();} }
+function resetTimer(){ stopTimer(); timerSeconds=0; timerRunning=false; timerStarted=false; timerTimedOut=false; timerFinished=false; document.getElementById('timeoutBanner').style.display='none'; updateStartBtn(); }
+
+/* =========================================
+VERSION / PROJECT / QUESTION
+========================================= */
+function changeProject(index){
+    currentProject=parseInt(index); currentQuestion=0;
+    highestUnlocked=0;
+    totalProjectScore=0; totalProjectMax=0;
+    resetTimer();
+    document.getElementById('step1Select').selectedIndex=0; 
+    const questions=PROJECTS[currentProject]||[];
+    const qSelect=document.getElementById('questionSelect');
+    if(questions.length===0){
+        qSelect.innerHTML='<option>— Chưa có câu hỏi —</option>';
+        document.getElementById('questionTitle').textContent='⚠️ Project này chưa có câu hỏi.';
+        document.getElementById('stepTitle').textContent='';
+        
+        const rTop = document.getElementById('simulatorRowTop');
+        const dPage = document.getElementById('wordDocumentPage');
+        if(rTop) rTop.innerHTML = '';
+        if(dPage) dPage.innerHTML = '';
+
+        document.getElementById('result').innerHTML='';
+        document.getElementById('stepPopup').style.display='none';
+        resetResultPanel(); return;
+    }
+    renderDropdown(); qSelect.value=0; loadQuestion(0);
+}
+
+function renderDropdown(){
+    const select=document.getElementById('questionSelect');
+    const questions=PROJECTS[currentProject]||[];
+    let html='';
+    questions.forEach(function(q,index){
+        const locked = LOCK_SEQUENCE && (index > highestUnlocked);
+        const done   = (index < highestUnlocked);
+        const prefix = locked ? '🔒 ' : (done ? '✅ ' : '');
+        const title  = (currentLang==='vi' && q.titleVi) ? q.titleVi : q.title;
+        html += '<option value="'+index+'"'+(locked?' class="locked-question" disabled':'')+'>'+prefix+title+'</option>';
+    });
+    select.innerHTML=html;
+    select.value=currentQuestion;
+}
+
+function loadQuestion(index){
+    const mainCbox = document.getElementById('coordBox');
+    if (mainCbox) { mainCbox.style.display = 'none'; mainCbox.innerHTML = ''; }
+    if (typeof closeMosPopup === 'function') closeMosPopup();
+    currentQuestion=parseInt(index); currentStep=0;
+    step1Completed=false; step1WrongCount=0; wrongCount=[];
+    const q=PROJECTS[currentProject][currentQuestion];
+    if(!q){ document.getElementById('questionTitle').textContent='⚠️ Câu hỏi không tồn tại.'; return; }
+    document.getElementById('result').innerHTML='';
+    document.getElementById('stepPopup').style.display='none';
+    
+    const rTop = document.getElementById('simulatorRowTop');
+    const dPage = document.getElementById('wordDocumentPage');
+    if(rTop) rTop.innerHTML = '';
+    if(dPage) dPage.innerHTML = '';
+
+    document.getElementById('step1Select').selectedIndex=0;
+    applyStep1Group(q);
+    resetResultPanel(); renderQuestion();
+}
+
+/* =========================================
+RESET / HIỂN THỊ CỘT PHẢI
+========================================= */
+function resetResultPanel(){
+    document.getElementById('resultPlaceholder').style.display='flex';
+    document.getElementById('resultImgBox').style.display='none';
+}
+function showResultImage(step){
+    document.getElementById('resultPlaceholder').style.display='none';
+    document.getElementById('resultImgBox').style.display='block';
+    document.getElementById('resultImg').src=step.imgResult||'';
+    document.getElementById('resultImgBadge').textContent='✔ '+step.text;
+}
+
+function showFinalImage(step){
+    const docPage = document.getElementById('wordDocumentPage') || document.getElementById('simulatorRowBottom');
+    const imgSrc = step.imgFinal || step.imgResult || '';
+    /* Câu dùng trang giả lập (popup 64): GIỮ NGUYÊN trang đã tô sáng/đậm, chỉ thêm dải thông báo hoàn thành */
+    if(docPage && window._pageState && window._pageState.qKey === (currentProject + '-' + currentQuestion)){
+        const pageBody = document.getElementById('wordDocBody');
+        if(pageBody){
+            const banner = document.createElement('div');
+            banner.style.cssText = 'background:#16a34a; color:#fff; font-size:13px; font-weight:bold; padding:6px 12px; margin-top:6px; border-radius:4px;';
+            banner.textContent = '🏁 Kết quả hoàn thành câu hỏi';
+            pageBody.appendChild(banner);
+            return;
+        }
+    }
+    if(docPage){
+        docPage.innerHTML = '<div style="text-align:center; padding:5px; max-width:100%; box-sizing:border-box; overflow:hidden;">'
+            +'<img src="'+imgSrc+'" style="max-width:100%; width:auto; max-height:320px; height:auto; display:block; margin:0 auto; border:1px solid #cbd5e1; box-sizing:border-box;">'
+            +'<div style="background:#16a34a; color:#fff; font-size:13px; font-weight:bold; '
+            +'padding:6px 12px; margin-top:6px; border-radius:4px;">🏁 Kết quả hoàn thành câu hỏi</div></div>';
+    }
+}
+
+/* =========================================
+POPUP + HINT
+========================================= */
+function showStepPopup(message,isCorrect,imgResult){
+    const popup=document.getElementById('stepPopup');
+    popup.style.display='block';
+    popup.style.background=isCorrect?'#ecfdf5':'#fef2f2';
+    popup.style.border=isCorrect?'2px solid #16a34a':'2px solid #dc2626';
+    popup.style.color=isCorrect?'#065f46':'#991b1b';
+    let html='<span>'+message+'</span>';
+    if(!isCorrect&&imgResult){ html+=' <button class="hint-btn" onclick="showHint(\''+imgResult+'\')">💡 Hướng dẫn</button>'; }
+    popup.innerHTML=html;
+}
+function showHint(imgSrc){
+    if(document.getElementById('hintOverlay')){return;}
+    const overlay=document.createElement('div');
+    overlay.className='hint-overlay'; overlay.id='hintOverlay';
+    const step=PROJECTS[currentProject][currentQuestion].steps[currentStep];
+    const stepTxt=step?step.text:'Đáp án đúng';
+    overlay.innerHTML='<div class="hint-box"><div class="hint-close" onclick="closeHint()">✖</div><div class="hint-box-title">💡 Hướng dẫn — '+stepTxt+'</div><img src="'+imgSrc+'" alt="Hướng dẫn đúng"></div>';
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click',function(e){if(e.target===overlay){closeHint();}});
+}
+function closeHint(){ const o=document.getElementById('hintOverlay'); if(o){o.remove();} }
+
+/* =========================================
+CHECK STEP 1
+========================================= */
+const STEP1_GROUP_A_INDEXES = [0,1,2,3,4,5,6,7];
+const STEP1_GROUP_B_INDEXES = [0,3,4,9,10,11];
+const STEP1_GROUP_C_INDEXES = [0,2,5,6];
+
+function applyStep1Group(q){
+    const select = document.getElementById('step1Select');
+    const group  = q.step1Group;
+    Array.from(select.options).forEach(function(opt, idx){
+        if(!group){
+            opt.style.display = '';
+        } else if(group === 'A'){
+            opt.style.display = STEP1_GROUP_A_INDEXES.includes(idx) ? '' : 'none';
+        } else if(group === 'B'){
+            opt.style.display = STEP1_GROUP_B_INDEXES.includes(idx) ? '' : 'none';
+        } else if(group === 'C'){
+            opt.style.display = STEP1_GROUP_C_INDEXES.includes(idx) ? '' : 'none';
+        }
+    });
+}
+
+function checkStep1(){
+    if(debugMode){return;}
+    const q=PROJECTS[currentProject][currentQuestion];
+    const selectedIndex=document.getElementById('step1Select').selectedIndex;
+    if(selectedIndex===q.correctStep1){
+        step1Completed=true; showStepPopup('✔ ĐÚNG BƯỚC 1',true);
+        if(q.imgResult1){showResultImage({text:'Bước 1 đúng',imgResult:q.imgResult1});}
+        renderQuestion();
+    } else {
+        step1Completed=false; step1WrongCount++;
+        showStepPopup('❌ Sai bước 1 | Sai '+step1WrongCount+' lần',false);
+    }
+}
+
+/* =========================================
+RENDER QUESTION (CẤU TRÚC 2 DÒNG CHUẨN)
+========================================= */
+function renderQuestion(){
+    const q = PROJECTS[currentProject] && PROJECTS[currentProject][currentQuestion];
+    if (!q || !q.steps || !q.steps[currentStep]) return;
+    
+    const step = q.steps[currentStep];
+    const titleDisplay = (currentLang === 'vi' && q.titleVi) ? q.titleVi : q.title;
+    document.getElementById('questionTitle').innerHTML = titleDisplay;
+    document.getElementById('stepTitle').innerHTML = step.text;
+    
+    updateCoordinateBox();
+
+    const rowTop = document.getElementById('simulatorRowTop');
+    const docPage = document.getElementById('wordDocumentPage');
+
+    if(rowTop) rowTop.innerHTML = '';
+	if(docPage) docPage.innerHTML = '<div id="wordDocBody"></div>';
+    const pageRestored = !!(window.renderPageState && window.renderPageState());
+
+    // 1. DÒNG 1: RIBBON THAO TÁC
+    if(step.img && rowTop){
+        rowTop.innerHTML = '<img src="' + step.img + '" id="simImg" style="width:100%;height:100%;object-fit:contain;display:block;">';
+    } else if(rowTop){
+        rowTop.innerHTML = '<div style="color:#94a3b8;font-size:13px;font-weight:bold;padding:10px;">[ Dòng 1: Ribbon thao tác ]</div>';
+    }
+
+    // 2. DÒNG 2: POPUP HOẶC HOTSPOT TƯƠNG TÁC
+    if(step.popupType){
+        const hl = document.getElementById('hotspotLayer');
+        if(hl) hl.innerHTML = '';   // dọn hotspot cũ để không chặn chuột / không hiện hotspot của bước trước
+        openMosPopup(step);
+        return;
+    } else if(docPage) {
+        const docBody = document.getElementById('wordDocBody');
+        const hotspotLayer = document.getElementById('hotspotLayer');
+
+        if(!pageRestored){ docBody.innerHTML = '<p style="margin-top:0;">Nội dung trang văn bản mô phỏng thuộc bài tập...</p>'; }
+        hotspotLayer.innerHTML = '<div class="click-layer" id="clickLayer"></div>'
+            + '<div id="hotspot" class="hotspot' + (debugMode ? ' debug' : '') + '"></div>';
+
+        const hotspot = hotspotLayer.querySelector('#hotspot');
+        const clickLayer = hotspotLayer.querySelector('#clickLayer');
+        const simImg = document.getElementById('simImg') || docPage;
+
+
+// TÍNH TOÁN VỊ TRÍ HOTSPOT THEO PIXEL TUYỆT ĐỐI
+        function positionHotspotByPercent(){
+            if(!step.hotspot) return;
+            hotspot.style.left   = step.hotspot.x + 'px';
+            hotspot.style.top    = step.hotspot.y + 'px';
+            hotspot.style.width  = step.hotspot.w + 'px';
+            hotspot.style.height = step.hotspot.h + 'px';
+            updateCoordinateBox();
+        }
+
+        if(simImg.complete && simImg.naturalWidth){
+            positionHotspotByPercent();
+        } else if(simImg.addEventListener) {
+            simImg.addEventListener('load', positionHotspotByPercent);
+        } else {
+            positionHotspotByPercent();
+        }
+
+        hotspot.addEventListener('click', function(e){
+            e.stopPropagation();
+            if(!debugMode){
+                hotspot.style.border     = '3px solid #16a34a';
+                hotspot.style.background = 'rgba(22,163,74,0.15)';
+            }
+            checkCorrect();
+        });
+
+        clickLayer.addEventListener('click', function(){ checkWrong(); });
+
+// XỬ LÝ KÉO THẢ TỰ DO TRÊN CẢ 2 VÙNG (RIBBON VÀ VĂN BẢN)
+        if(debugMode && step.hotspot){
+            hotspot.style.pointerEvents = 'auto'; // Bắt buộc mở khóa nhận chuột
+            
+            const resizeHandle = document.createElement('div');
+            resizeHandle.id = 'hotspotResizeHandle';
+            resizeHandle.style.cssText = 'position:absolute;right:-5px;bottom:-5px;width:12px;height:12px;background:#f59e0b;border:1px solid #fff;cursor:se-resize;z-index:9999;';
+            hotspot.appendChild(resizeHandle);
+
+            let dragMode = null, startX = 0, startY = 0;
+            
+            hotspot.addEventListener('mousedown', function(e){
+                dragMode = (e.target === resizeHandle) ? 'resize' : 'move';
+                startX = e.clientX; 
+                startY = e.clientY;
+                e.preventDefault(); 
+                e.stopPropagation();
+            });
+
+            window.addEventListener('mousemove', function(e){
+                if(!dragMode) return;
+                
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+
+                if(dragMode === 'move'){
+                    step.hotspot.x = Math.round(step.hotspot.x + dx);
+                    step.hotspot.y = Math.round(step.hotspot.y + dy);
+                } else {
+                    step.hotspot.w = Math.max(10, Math.round(step.hotspot.w + dx));
+                    step.hotspot.h = Math.max(10, Math.round(step.hotspot.h + dy));
+                }
+
+                positionHotspotByPercent();
+                startX = e.clientX; 
+                startY = e.clientY;
+            });
+
+            window.addEventListener('mouseup', function(){ 
+                dragMode = null;             });
+        }
+    }
+}
+
+/* =========================================
+CORRECT / WRONG / NEXT
+========================================= */
+function checkCorrect(){
+    if(debugMode){return;}
+    if(!step1Completed){showStepPopup('❌ Hãy hoàn thành đúng Bước 1 trước',false);return;}
+    const q=PROJECTS[currentProject][currentQuestion];
+    const step=q.steps[currentStep];
+    const lastIdx=getEffectiveLastStepIndex(q);
+    const isLastStep=(currentStep>=lastIdx);
+    if(step.pageEffect && window.applyPageEffect){ window.applyPageEffect(step.pageEffect); }
+    showStepPopup('✔ ĐÚNG: '+step.text,true); showResultImage(step);
+    if(isLastStep){showFinalImage(step);}
+    setTimeout(function(){nextStep();},700);
+}
+function checkWrong(){
+    if(debugMode){return;}
+    if(!step1Completed){showStepPopup('❌ Hãy hoàn thành đúng Bước 1 trước',false);return;}
+    if(!wrongCount[currentStep]){wrongCount[currentStep]=0;}
+    wrongCount[currentStep]++;
+    const step=PROJECTS[currentProject][currentQuestion].steps[currentStep];
+    if(testMode){
+        showStepPopup('❌ SAI: '+step.text,false);
+    } else {
+        showStepPopup('❌ SAI: '+step.text+' | Sai '+wrongCount[currentStep]+' lần',false,step.imgResult||null);
+    }
+}
+function nextStep(){
+    const q=PROJECTS[currentProject][currentQuestion];
+    const lastIdx=getEffectiveLastStepIndex(q);
+    if(currentStep>=lastIdx){finishQuestion();return;}
+    currentStep++; renderQuestion();
+}
+
+/* =========================================
+FINISH QUESTION
+========================================= */
+function finishQuestion(){
+    document.getElementById('stepTitle').textContent='🎉 Đã hoàn thành câu hỏi';
+    const q=PROJECTS[currentProject][currentQuestion];
+    const lastIdx=getEffectiveLastStepIndex(q);
+    const step1Correct=(step1WrongCount===0)?1:0;
+    let stepsCorrect=0;
+    for(let i=0;i<=lastIdx;i++){if((wrongCount[i]||0)===0){stepsCorrect++;}}
+    const totalCorrect=step1Correct+stepsCorrect;
+    const maxScore=(lastIdx+1+1)*5;
+    const questionScore=totalCorrect*5;
+    const percent=Math.round((questionScore/maxScore)*100);
+    totalProjectScore+=questionScore; totalProjectMax+=maxScore;
+    const questions=PROJECTS[currentProject];
+    const isLastQuestion=(currentQuestion>=questions.length-1);
+    if(currentQuestion>=highestUnlocked&&!isLastQuestion){ highestUnlocked=currentQuestion+1; renderDropdown(); }
+    if(isLastQuestion){ finishTimer(); completedProjects.add(currentProjectIndex); markProjectDone(currentProjectIndex); }
+
+    if(testMode){
+        showTestModeCountdown(isLastQuestion, questions);
+        return;
+    }
+
+    const overlay=document.getElementById('result');
+    const box=document.createElement('div'); box.className='result-box';
+    const closeBtn=document.createElement('div'); closeBtn.className='close-btn'; closeBtn.textContent='✖'; closeBtn.onclick=closeResult; box.appendChild(closeBtn);
+    const h3=document.createElement('h3'); h3.textContent='📊 /- Skill Assessment -/'; box.appendChild(h3);
+    const scoreDiv=document.createElement('div');
+    scoreDiv.style.cssText='margin-top:12px;padding:14px;border-radius:8px;background:#dbeafe;font-size:22px;font-weight:bold;line-height:1.8;';
+    scoreDiv.innerHTML='🏆 Điểm: '+questionScore+'/'+maxScore+' ~ '+percent+'%   |   Tổng project: '+totalProjectScore+'/'+totalProjectMax+(isLastQuestion?'<br>⏱ Thời gian: '+formatTime(timerSeconds):'');
+    box.appendChild(scoreDiv);
+    const s1Block=document.createElement('div'); s1Block.style.cssText='margin-top:12px;padding:12px;border:1px solid #ddd;border-radius:8px;background:#fff;font-size:18px;';
+    const s1Label=document.createElement('b'); s1Label.textContent='Bước 1. Chọn đối tượng cần thực hiện';
+    const s1Info=document.createElement('span'); s1Info.style.color=step1Correct?'#16a34a':'#dc2626';
+    s1Info.textContent='  —  Sai: '+step1WrongCount+' lần'+(step1Correct?'  ✔ +5đ':'  ✖ +0đ');
+    s1Block.appendChild(s1Label); s1Block.appendChild(s1Info); box.appendChild(s1Block);
+    for(let i=0;i<=lastIdx;i++){
+        const sai=wrongCount[i]||0; const correct=(sai===0);
+        const block=document.createElement('div'); block.style.cssText='margin-top:12px;padding:12px;border:1px solid #ddd;border-radius:8px;background:#fff;font-size:18px;';
+        const label=document.createElement('b'); label.textContent=q.steps[i].text;
+        const info=document.createElement('span'); info.style.color=correct?'#16a34a':'#dc2626';
+        info.textContent='  —  Sai: '+sai+' lần'+(correct?'  ✔ +5đ':'  ✖ +0đ');
+        block.appendChild(label); block.appendChild(info); box.appendChild(block);
+    }
+    const btnWrap=document.createElement('div'); btnWrap.style.cssText='display:flex;gap:12px;justify-content:center;margin-top:20px;flex-wrap:wrap;';
+    const endBtn=document.createElement('button'); endBtn.textContent='🏁 Finish';
+    endBtn.style.cssText='background:#dc2626;padding:12px 20px;font-size:16px;font-weight:bold;border:none;border-radius:10px;cursor:pointer;color:#fff;';
+    endBtn.onclick=function(){ closeResult(); if(isLastQuestion){ showProjectSummary(); } };
+    const nextBtn=document.createElement('button'); nextBtn.textContent='Next ➡';
+    nextBtn.style.cssText='background:#2563eb;padding:12px 20px;font-size:16px;font-weight:bold;border:none;border-radius:10px;cursor:pointer;color:#fff;';
+    nextBtn.onclick=function(){
+        if(currentQuestion<questions.length-1){ closeResult(); currentQuestion++; document.getElementById('questionSelect').value=currentQuestion; loadQuestion(currentQuestion); }
+        else { closeResult(); showProjectSummary(); }
+    };
+    if(isLastQuestion){ nextBtn.style.display='none'; }
+    btnWrap.appendChild(endBtn); btnWrap.appendChild(nextBtn); box.appendChild(btnWrap);
+    overlay.innerHTML=''; overlay.appendChild(box);
+}
+
+function showTestModeCountdown(isLastQuestion, questions){
+    let sec = 3;
+    const stepTitleEl = document.getElementById('stepTitle');
+    stepTitleEl.textContent = '🎉 Hoàn thành câu hỏi — Tự động chuyển câu hỏi sau ' + sec + 's';
+    const timer = setInterval(function(){
+        sec--;
+        if(sec > 0){
+            stepTitleEl.textContent = '🎉 Hoàn thành câu hỏi — Tự động chuyển sau ' + sec + 's';
+        } else {
+            clearInterval(timer);
+            if(isLastQuestion){
+                showProjectSummary();
+            } else {
+                currentQuestion++;
+                document.getElementById('questionSelect').value = currentQuestion;
+                loadQuestion(currentQuestion);
+            }
+        }
+    }, 1000);
+}
+
+/* =========================================
+ĐÁNH DẤU PROJECT + TỔNG KẾT
+========================================= */
+function markProjectDone(idx){
+    const sel=document.getElementById('projectSelect');
+    const opt=sel.options[idx+1];
+    if(opt&&!opt.text.includes('✅')){ opt.text=opt.text+' ✅'; opt.style.color='#16a34a'; }
+}
+function showProjectSummary(){
+    const totalDone=completedProjects.size; const isAllDone=(totalDone>=7);
+    const overlay=document.getElementById('result');
+    const box=document.createElement('div'); box.className=isAllDone?'project-summary-box final-summary':'project-summary-box';
+    const closeBtn=document.createElement('div'); closeBtn.className='close-btn'; closeBtn.textContent='✖';
+    if(isAllDone){ closeBtn.style.display='block'; closeBtn.onclick=function(){window.close();}; }
+    else { closeBtn.style.display='none'; }
+    box.appendChild(closeBtn);
+    const h2=document.createElement('h2'); h2.style.cssText='font-size:24px;color:#92400e;margin-bottom:16px;';
+    h2.textContent=isAllDone?'🎓 Chúc mừng! Bạn đã hoàn thành tất cả 7 Project!':'🏆 Tổng kết Project '+(currentProjectIndex+1);
+    box.appendChild(h2);
+    const scoreDiv=document.createElement('div'); scoreDiv.style.cssText='padding:16px;background:#fef9c3;border-radius:10px;font-size:20px;font-weight:bold;margin-bottom:20px;';
+    scoreDiv.innerHTML='📊 Điểm project: <b>'+totalProjectScore+' / '+totalProjectMax+'</b>&nbsp;|&nbsp;⏱ <b>'+formatTime(timerSeconds)+'</b><br><span style="font-size:15px;font-weight:normal;color:#78716c;">Đã hoàn thành: '+totalDone+'/7 project</span>';
+    box.appendChild(scoreDiv);
+    const btnWrap=document.createElement('div'); btnWrap.style.cssText='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:8px;';
+    const homeBtn=document.createElement('button'); homeBtn.textContent='⬅ Home';
+    homeBtn.style.cssText='background:#dc2626;padding:14px 28px;font-size:17px;font-weight:bold;border:none;border-radius:12px;cursor:pointer;color:#fff;';
+    homeBtn.onclick=function(){goHome();}; btnWrap.appendChild(homeBtn);
+    if(!isAllDone){
+        const continueBtn=document.createElement('button'); continueBtn.textContent='📚 Tiếp tục Project';
+        continueBtn.style.cssText='background:#16a34a;padding:14px 28px;font-size:17px;font-weight:bold;border:none;border-radius:12px;cursor:pointer;color:#fff;';
+        continueBtn.onclick=function(){
+            projectLocked=false; currentProjectIndex=-1; closeResult();
+            document.getElementById('questionSelect').classList.add('hidden-select');
+            document.getElementById('step1Select').selectedIndex=0;
+            document.getElementById('questionTitle').innerHTML='📌 Hãy chọn <b>-Project-</b> tiếp theo, hoặc chọn nút -Home- để kết thúc bài test. Project làm xong sẽ bị khóa.';
+            document.getElementById('stepTitle').textContent='';
+            
+            const rTop = document.getElementById('simulatorRowTop');
+            const dPage = document.getElementById('wordDocumentPage');
+            if(rTop) rTop.innerHTML = '';
+            if(dPage) dPage.innerHTML = '';
+            resetResultPanel();
+        };
+        btnWrap.appendChild(continueBtn);
+    }
+    box.appendChild(btnWrap); overlay.innerHTML=''; overlay.appendChild(box);
+    if(isAllDone){ window.onbeforeunload=null; }
+}
+function closeResult(){ document.getElementById('result').innerHTML=''; }
+
+/* =========================================
+DEBUG / COORDINATE / VIDEO / HOME
+========================================= */
+function toggleDebug(){
+    if(IS_PUBLISHED){
+        alert('⚠️ Bạn chưa được cấp quyền sử dụng chức năng này.');
+        return;
+    }
+    debugMode = !debugMode;
+    const btn = document.getElementById('debugBtn');
+    if(btn){ btn.classList.toggle('active', debugMode); }
+    renderQuestion();
+}
+
+function updateCoordinateBox(){
+    const q = PROJECTS[currentProject] && PROJECTS[currentProject][currentQuestion];
+    if (!q || !q.steps || !q.steps[currentStep]) return;
+    const step = q.steps[currentStep];
+    const box = document.getElementById('coordBox');
+    
+    if(debugMode && step.hotspot){
+        box.style.display = 'block';
+        box.innerHTML = 'x: ' + step.hotspot.x + '<br>y: ' + step.hotspot.y + '<br>width: ' + step.hotspot.w + '<br>height: ' + step.hotspot.h
+            + '<br><button type="button" onclick="centerHotspot()" style="margin-top:8px;padding:6px 14px;background:#f59e0b;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">🎯 Đưa về giữa khung</button>';
+    } else { 
+        box.style.display = 'none'; 
+    }
+}
+
+function centerHotspot(){
+    const q = PROJECTS[currentProject] && PROJECTS[currentProject][currentQuestion];
+    if (!q || !q.steps || !q.steps[currentStep]) return;
+    
+    const step = q.steps[currentStep];
+    
+    /* BẢO VỆ CHỐNG TRẮNG MÀN HÌNH CÂU HỎI */
+    if (!step.hotspot) {
+        alert('⚠️ Bước này sử dụng bảng hội thoại Popup, không có khung Hotspot.');
+        return;
+    }
+    
+    const container = document.getElementById('simulator0');
+    if (!container) return;
+    
+    const baseW = container.offsetWidth || 800;
+    const baseH = container.offsetHeight || 500;
+
+    step.hotspot.x = Math.round((baseW - (step.hotspot.w || 50)) / 2);
+    step.hotspot.y = Math.round((baseH - (step.hotspot.h || 50)) / 2);
+    
+    renderQuestion();
+}
+
+function openVideo(){ const q=PROJECTS[currentProject][currentQuestion]; window.open(q.video,'_blank'); }
+function goHome(){
+    if(window.opener&&!window.opener.closed){ window.close(); }
+    else { window.location.href='index.html'; }
+}
+/* =========================================
+INIT KHỞI TẠO TỆP
+========================================= */
+totalProjectScore=0; totalProjectMax=0;
+document.getElementById('questionTitle').innerHTML='⚠️ Hãy chọn *<b>Phiên bản</b> &amp; <b>Dự án</b>* bắt đầu luyện thi. Hoặc xem <I>*Hướng dẫn sử dụng*<I>';
+document.getElementById('stepTitle').innerHTML='';
+
+const rTopInit = document.getElementById('simulatorRowTop');
+const dPageInit = document.getElementById('wordDocumentPage');
+if(rTopInit) rTopInit.innerHTML = '';
+if(dPageInit) dPageInit.innerHTML = '';
+
+</script>
+<script src='Mos2vung.js'></script>
+</body>
+</html>
